@@ -2,17 +2,8 @@
 
 export CLASSPATH=".:build:lib/*"
 
-echo Cleaning up
-rm -fr build/*
-
-echo Building
-javac -d build ca/uwaterloo/watca/*.java
-if [ $? -ne 0 ]; then
-    exit
-fi
-
 echo Running
-java ca.uwaterloo.watca.LinearizabilityTest execution.log scores.txt
+java -cp ".:target/WatCA-1.0-SNAPSHOT.jar" ca.uwaterloo.watca.LinearizabilityTest execution.log scores.txt
 
 echo Done
 #echo Top of scores.txt file:
