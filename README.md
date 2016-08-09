@@ -2,7 +2,7 @@
 
 ## Overview
 WatCA is a tool for analyzing consistency in distributed storage systems and in concurrent data structures.
-The current version supports key-value storage systems that support read and write (i.e., get and put) operations
+The current version supports key-value storage systems (e.g., Cassandra, Riak) that support read and write (i.e., get and put) operations
 and detects violations of [Herlihy and Wing's linearizability property](http://dl.acm.org/citation.cfm?id=78972).
 The input to the tool is a log file that records the invocation and response of every operation applied
 to the storage system, whose format is described below.
@@ -44,7 +44,7 @@ Java process, as otherwise timestamps obtained using System.nanoTime() are incom
 4. ./lintest.sh
 5. cat scores.txt
 
-## Research Team
+## Development Team
 - Hua Fan - PhD candidate
 - Shankha Chatterjee - MASc candidate
 - Wojciech Golab - Assistant Professor (https://ece.uwaterloo.ca/~wgolab/)
@@ -55,5 +55,10 @@ a linearizability analyzer based on model checking techniques.
 Compared to WatCA, Knossos deals with a broader range of data types but is prone
 to the exponential state space explosion problem.
 
-Another closely related system is [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf),
+Another related system is [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf),
 a real-time serializability analyzer for transactions.
+
+## Funding Acknowledgment
+Graduate students involved in this project were supported in part by the
+[Natural Sciences and Engineering Council of Canada (NSERC)](http://www.nserc-crsng.gc.ca)
+and the [Google Faculty Research Awards Program](http://research.google.com/research-outreach.html#/research-outreach/faculty-engagement/faculty-research-awards).
