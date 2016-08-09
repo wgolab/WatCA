@@ -7,7 +7,7 @@ and detects violations of [Herlihy and Wing's linearizability property](http://d
 The input to the tool is a log file that records the invocation and response of every operation applied
 to the storage system, whose format is described below.
 
-## Log format
+## Log Format
 The log file must contain one invocation or response event per line.
 Each line has the following general format:
 
@@ -23,7 +23,7 @@ The **key** and **value** denote the key-value pair, and must not contain any ta
 (If in doubt, encode the values using base64 or hash them.)
 The **value** is only included in the invocation event or a write and the response event of a read.
 
-Sample log files are provided in the [samplelogs](tree/master/samplelogs) subdirectory.
+Sample log files are provided in the [samplelogs](/WatCA/tree/master/samplelogs) subdirectory.
 One file is a positive example, meaning that it satisfies linearizability.
 The other file is a negative example, meaning that it violates linearizability.
 WatCA will identify one or more linearizability violations in the negative example,
@@ -31,7 +31,7 @@ and for each violation it will identify a key and a pair of values responsible f
 
 To create your own log, you must instrument your client code by capturing the invocation
 and response of each storage operation.
-The utility class [ExecutionLogger.java](tree/master/src/main/java/ca/uwaterloo/watca/ExecutionLogger.java)
+The utility class [ExecutionLogger.java](/WatCA/tree/master/src/main/java/ca/uwaterloo/watca/ExecutionLogger.java)
 can be used for this purpose but only in the special case when all the client threads are in the same
 Java process, as otherwise timestamps obtained using System.nanoTime() are incomparable.
 
