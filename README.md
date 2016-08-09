@@ -48,3 +48,12 @@ Java process, as otherwise timestamps obtained using System.nanoTime() are incom
 - Hua Fan - PhD candidate
 - Shankha Chatterjee - MASc candidate
 - Wojciech Golab - Assistant Professor (https://ece.uwaterloo.ca/~wgolab/)
+
+## Related Work
+WatCA is most closely related to [Knossos](https://github.com/aphyr/knossos),
+a linearizability analyzer based on model checking techniques.
+Compared to WatCA, Knossos deals with a broader range of data types but is prone
+to the exponential state space explosion problem.
+
+Another closely related system is [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf),
+a real-time serializability analyzer for transactions.
