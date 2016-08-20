@@ -70,6 +70,10 @@ public class History {
         clusterSet.removeAll(deleteList);
     }
 
+    public List<Long> getScores(ScoreFunction sfn) {
+	return logScores(sfn, null);
+    }
+
     public List<Long> logScores(ScoreFunction sfn, PrintWriter out) {
         List<Long> ret = new ArrayList();
         for (Cluster a : clusterSet) {
@@ -81,7 +85,8 @@ public class History {
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);
                     }
-		    out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
+		    if (out != null)
+			out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                 } else if (a.overlaps(b)) {
                     long newScore = Collections.max(sfn.getScores(a, b));
                     if (newScore > 0) {
@@ -89,7 +94,8 @@ public class History {
                         if (b.getScore() < newScore) {
                             b.setScore(newScore);
                         }
-			out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
+			if (out != null)
+			    out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
                     }
                 } else {
                     break;
@@ -98,7 +104,8 @@ public class History {
             a.setScore(tempScore);            
             // Log scores
 	    if (tempScore == 0)
-		out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + tempScore);
+		if (out != null)
+		    out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + tempScore);
             
             ret.add(tempScore);
         }
