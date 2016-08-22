@@ -482,7 +482,6 @@ class WebServer {
                 ret = ret + "<div style=\"float: left;\"><form name=\"scoreTypeForm\" action=\"setScoreType\" method=\"get\"> "
                         + "<select name=\"scoreType\" onchange=\"this.form.submit()\">"
                         + "<option value=\"regular\">Metric: Regular"
-                        + "<option value=\"gamma\">Metric: Gamma"
                         + "<option value=\"gk\">Metric: GK"
                         + "</select></form></div>";
                 String regex = "value=\"" + type + "\"";
