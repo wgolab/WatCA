@@ -33,11 +33,11 @@ class WebServer {
 
         InputStream input = null;
         try {
-            input = new FileInputStream("../scripts/config.properties");
+            input = new FileInputStream("config.properties");
             prop.load(input);
             // set up initial value for file "config.update"
             saveConfUpdate();
-            String cmd = "bash ../scripts/control.sh " + "storage_type";
+            String cmd = "bash control.sh " + "storage_type";
             Utility.runCmd(cmd);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -60,7 +60,7 @@ class WebServer {
     }
 
     void saveConfUpdate() {
-        File configUpdateFile = new File("../scripts/gen_file/config.update");
+        File configUpdateFile = new File("gen_file/config.update");
         FileWriter writer = null;
         try {
             writer = new FileWriter(configUpdateFile);
@@ -164,16 +164,16 @@ class WebServer {
                 ret = "<h1>Start NoSQL DB</h1>" + "<pre>Stopping service ...</pre>";
                 ret += "<pre>Starting service and waiting for confirmation\n" +
                         "(this may take more than one minute) ...</pre>";
-                cmd = "bash ../scripts/control.sh " + "start_db" ;
+                cmd = "bash control.sh " + "start_db" ;
             } else if (query.contains("action=stopDB")) {
                 ret = "<h1>Stop NoSQL DB</h1>" + "<pre>Stoppping service ...</pre>";
-                cmd = "bash ../scripts/control.sh " + "kill_db" ;
+                cmd = "bash control.sh " + "kill_db" ;
             } else if (query.contains("action=workYCSB")) {
                 ret = "<h1>YCSB Work</h1>" + "<pre>Running work phase ...</pre>";
-                cmd = "bash ../scripts/control.sh " + "work_ycsb";
+                cmd = "bash control.sh " + "work_ycsb";
             } else if (query.contains("action=loadYCSB")) {
                 ret = "<h1>YCSB Load</h1>" + "<pre>Running load phase ...</pre>";
-                cmd = "bash ../scripts/control.sh " + "load_ycsb";
+                cmd = "bash control.sh " + "load_ycsb";
             } else {
                 System.err.println("query has no valid action");
                 return;
@@ -317,12 +317,12 @@ class WebServer {
         }
 
         private void updateNetworkDelay() {
-            String cmd = "bash ../scripts/control.sh " + "kernel_net_delay";
+            String cmd = "bash control.sh " + "kernel_net_delay";
             Utility.runCmd(cmd);
         }
 
         private void updateStorageType() {
-            String cmd = "bash ../scripts/control.sh " + "storage_type";
+            String cmd = "bash control.sh " + "storage_type";
             Utility.runCmd(cmd);
         }
 
@@ -359,7 +359,7 @@ class WebServer {
 
         String root;
         public HandlerDefault() {
-            root = ".." + File.separator + "www";
+            root = "." + File.separator + "www";
         }
 
         public void handle(HttpExchange t) throws IOException {
