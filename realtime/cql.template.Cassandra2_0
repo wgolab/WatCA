@@ -1,0 +1,5 @@
+create keyspace usertable
+with placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy'
+and strategy_options = {replication_factor: Replication_Factor_Placeholder };
+use usertable;
+create column family data with column_type = 'Standard' and comparator = UTF8Type and column_metadata = [{column_name: 'field0', validation_class:BytesType}];

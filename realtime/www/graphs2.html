@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <meta http-equiv="refresh" content="60">
+    <style>
+      * { font-family: sans-serif }
+    </style>
+    <title>WatCA GUI</title>
+
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+    
+    google.charts.load("current", {packages:["corechart"]});
+
+    // Instantiate and draw charts.
+    var chartLatencyStaleProp = null;
+    var numUpdates = 0;
+    var refreshTimeout = 100;
+
+    var options = {
+          legend: 'top',
+          chartArea: {'width': '80%', 'height': '70%'},
+          curveType: 'none'
+    };
+
+    google.charts.setOnLoadCallback(drawChartLatencyStaleProp);
+
+
+
+    function drawChartLatencyStaleProp() {
+      // Stale proportion
+      var startTime;
+      $.ajax({
+          url: "latencyStaleProp.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataStaleProp = new google.visualization.DataTable(result);
+              if (!chartLatencyStaleProp)
+                  chartLatencyStaleProp = new google.visualization.ScatterChart(document.getElementById('chart_div_latency_stale_prop'));
+              options.legend = 'none';
+              options.title = 'Latency-Consistency Trade-off';
+              options.vAxis = {title: 'Frequency of inconsistent operations', viewWindow: {min: 0}};
+              options.hAxis = {title: 'Average latency (ms)', viewWindow: {min: 0}};
+              chartLatencyStaleProp.draw(dataStaleProp, options);
+
+              setTimeout(drawChartLatencyStaleProp, Math.max(0, refreshTimeout - ajaxLatency));
+
+              var d = new Date();
+              $("#bottom_text").text("Last update: " + d.toLocaleString() + ", number of updates " + numUpdates++);
+              //$("#bottom_text").text("Update number " + numUpdates++);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChartLatencyStaleProp, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+    </script>
+  </head>
+
+  <body>
+	<div id="chart_div_latency_stale_prop" style="width: 100%; height: 90%; float: left;"></div>
+    <hr>
+    <div id="bottom_text"></div>
+    <br/>
+    <div>
+      <a href="graphs.html">Main screen</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs2.html">Latency-staleness graph</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs3.html">Consistency spectrum</a>
+    </div>
+  </body>
+</html>

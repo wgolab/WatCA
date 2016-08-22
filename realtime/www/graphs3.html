@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <meta http-equiv="refresh" content="60">
+    <style>
+      * { font-family: sans-serif }
+    </style>
+    <title>WatCA GUI</title>
+
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+    
+    google.charts.load("current", {packages:["corechart"]});
+
+    // Instantiate and draw charts.
+    var chartHisto = null;
+    var numUpdates = 0;
+    var refreshTimeout = 100;
+
+    var options = {
+          legend: 'top',
+          chartArea: {'width': '80%', 'height': '70%'}
+    };
+
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      // Consistency spectrum
+      var startTime;
+      $.ajax({
+          url: "consistencySpectrum.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataHisto = new google.visualization.DataTable(result);
+              if (!chartHisto)
+                  chartHisto = new google.visualization.ColumnChart(document.getElementById('chart_div_histo'));
+              options.legend = 'none';
+              options.title = 'Consistency Spectrum';
+              options.vAxis = {title: 'Frequency (logarithmic)', viewWindow: {min: 1}, scaleType: 'log'};
+              options.hAxis = {title: 'Severity of consistency anomalies (ms)'};
+              chartHisto.draw(dataHisto, options);
+
+              setTimeout(drawChart, Math.max(0, refreshTimeout - ajaxLatency));
+
+              var d = new Date();
+              $("#bottom_text").text("Last update: " + d.toLocaleString() + ", number of updates " + numUpdates++);
+              //$("#bottom_text").text("Update number " + numUpdates++);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChart, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+    </script>
+  </head>
+
+  <body>
+	<div id="chart_div_histo" style="width: 100%; height: 90%; float: left;"></div>
+    <hr>
+    <div id="bottom_text"></div>
+    <br/>
+    <div>
+      <a href="graphs.html">Main screen</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs2.html">Latency-staleness graph</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs3.html">Consistency spectrum</a>
+    </div>
+  </body>
+</html>

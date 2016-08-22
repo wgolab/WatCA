@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <meta http-equiv="refresh" content="60">
+    <style>
+      * { font-family: sans-serif }
+    </style>
+    <title>WatCA GUI</title>
+
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+    google.charts.load("current", {packages:["corechart"]});
+
+
+    // Instantiate and draw charts.
+    var chartStaleProp = null;
+    var chartStaleQuart = null;
+    var chartThroughput = null;
+    var chartLatency = null;
+    var numUpdates = 0;
+    var refreshTimeout = 100;
+
+    var options = {
+          legend: 'top',
+          chartArea: {'width': '80%', 'height': '70%'},
+          hAxis: {title: 'Time (seconds, relative to now)', viewWindow: {min: -60, max:0}},
+          curveType: 'none'
+    };
+
+    google.charts.setOnLoadCallback(updateGUI);
+
+    function updateGUI() {
+        drawChartStaleProp();
+        drawChartStaleQuart();
+        drawChartThroughput();
+        drawChartLatency();
+    }
+
+
+
+    function drawChartStaleProp() {
+      // Stale proportion
+      var startTime;
+      $.ajax({
+          url: "staleProp.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataStaleProp = new google.visualization.DataTable(result);
+              if (!chartStaleProp)
+                  chartStaleProp = new google.visualization.LineChart(document.getElementById('chart_div_stale_prop'));
+              options.legend = 'none';
+              options.title = 'Frequency of Inconsistent Operations';
+              options.vAxis = {title: 'Frequency', viewWindow: {min: 0}};
+			  options.series = { 0: { color: 'blue' }, 1: { color: 'gray' }};
+			  options.interpolateNulls = true;
+              chartStaleProp.draw(dataStaleProp, options);
+
+              setTimeout(drawChartStaleProp, Math.max(0, refreshTimeout - ajaxLatency));
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChartStaleProp, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+
+    function drawChartStaleQuart() {
+      // Stale quartiles
+      var startTime, ajaxLatency;
+      $.ajax({
+          url: "staleQuart.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataStaleQuart = new google.visualization.DataTable(result);
+              if (!chartStaleQuart)
+                  chartStaleQuart = new google.visualization.CandlestickChart(document.getElementById('chart_div_stale_quart'));
+              options.legend = 'none';
+              options.title = 'Severity of Consistency Anomalies';
+              options.vAxis = {title: 'min / 25% / 75% / max  (ms)', viewWindow: {min: 0}};
+              chartStaleQuart.draw(dataStaleQuart, options);
+
+              setTimeout(drawChartStaleQuart, Math.max(0, refreshTimeout - ajaxLatency));
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChartStaleQuart, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+
+    function drawChartThroughput() {
+      // Throughput
+      var startTime, ajaxLatency;
+      $.ajax({
+          url: "throughput.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataThroughput = new google.visualization.DataTable(result);
+              if (!chartThroughput)
+                  chartThroughput = new google.visualization.LineChart(document.getElementById('chart_div_throughput'));
+              options.legend = 'none';
+              options.title = 'Storage System Throughput';
+              options.vAxis = {title: 'Throughput (kops/s)', viewWindow: {min: 0}};
+			  options.series = { 0: { color: 'blue' }, 1: { color: 'gray' }};
+			  options.interpolateNulls = true;
+              chartThroughput.draw(dataThroughput, options);
+
+              setTimeout(drawChartThroughput, Math.max(0, refreshTimeout - ajaxLatency));
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChartThroughput, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+
+    function drawChartLatency() {
+      // Latency
+      var startTime;
+      $.ajax({
+          url: "latency.php",
+          dataType: "json",
+          beforeSend: function(xhr) { startTime = +new Date(); },
+          success: function(result) {
+              var ajaxLatency = (+new Date()) - startTime;
+              var dataLatency = new google.visualization.DataTable(result);
+              if (!chartLatency)
+                  chartLatency = new google.visualization.LineChart(document.getElementById('chart_div_latency'));
+              options.legend = 'top';
+              options.title = 'Storage System Latency';
+              options.vAxis = {title: 'Latency (ms)', viewWindow: {min: 0}};
+              options.series = { 0: { color: 'blue' }, 1: { color: 'red' }, 2: { color: 'black' }, 3: { color: 'gray' } };
+			  options.interpolateNulls = true;
+              chartLatency.draw(dataLatency, options);
+
+              setTimeout(drawChartLatency, Math.max(0, refreshTimeout - ajaxLatency));
+
+              var d = new Date();
+              $("#bottom_text").text("Last update: " + d.toLocaleString() + ", number of updates " + numUpdates++);
+              //$("#bottom_text").text("Update number " + numUpdates++);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+              var ajaxLatency = (+new Date()) - startTime;
+              setTimeout(drawChartLatency, Math.max(0, refreshTimeout - ajaxLatency));
+          }
+      });
+    }
+    </script>
+  </head>
+
+  <body>
+	<div id="chart_div_stale_prop" style="width: 50%; height: 45%; float: left;"></div>
+	<div id="chart_div_latency" style="width: 50%; height: 45%; float: left;"></div>
+	<div id="chart_div_stale_quart" style="width: 50%; height: 45%; float: left;"></div>
+	<div id="chart_div_throughput" style="width: 50%; height: 45%; float: left;"></div>
+    <hr>
+    <div id="bottom_text"></div>
+    <br/>
+    <div>
+      <a href="graphs.html">Main screen</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs2.html">Latency-staleness graph</a>&nbsp;&nbsp;&nbsp;
+      <a href="graphs3.html">Consistency spectrum</a>
+    </div>
+  </body>
+</html>
