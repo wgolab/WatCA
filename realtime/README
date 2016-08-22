@@ -1,0 +1,34 @@
+Step 0: SSH agent
+- Launch an ssh agent for passwordless authentication with EC2 hosts.
+
+Step 1: Launch instances
+- Launch Ubuntu 14.04 (64-bit) instances in EC2 in one or more geographical regions.
+- Use the default security group.
+
+Step 2: Prepare security group
+- Manually edit the default security group, adding an inbound rule that allows unrestricted traffic from the same group.
+- Remove all other inbound rules that may have been added by the scripts in prior runs.
+
+Step 3: Obtain list of host IPs
+- Configure the AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.
+- Ensure that the aws command line tools are installed.
+- Enter the name(s) of the region(s) in scripts/regions, one region per line.  Do not include the availability zone (e.g., "us-west-2" is correct, "uw-west-2a" is incorrect).
+- cd ConAnalysis/EC2
+- ./configure_ips.sh
+- Inspect ../scripts/servers_ec2 and ../scripts/servers_ec2_public_private to ensure that the files contain the correct number of entries, with one EC2 host per line.
+- NOTE: Do not run the tool (see last step) on the same host as one of the storage servers.
+        After completing this step, remove the IP of the host that runs the tool from servers_ec2 and servers_ec2_public_private.
+
+Step 4: Storage system setup
+- Run the scripts/setup_ubuntu_cluster.sh script.
+- Alternatively, at each host clone the git repository and then execute scripts/setup_ubuntu.sh to download and install Cassandra.
+- Most of the installation is non-interactive, but be prepared to accept the Oracle Java license agreement at each host.
+- Double-check that Cassandra got installed.  Update the CVER variable in setup_ubuntu.sh if you get an HTTP 404 response while trying to download Cassandra.
+
+Step 5: Configure tool
+- Edit settings.sh under the scripts subdirectory.  (Do not confuse this with settings.py, which is deprecated.)
+- Use default settings whenever possible.
+
+Step 6: Launch tool
+- From the scripts subdirectory execute ./run_watca.sh
+- By default, the web interface binds to port 12346.
