@@ -193,6 +193,7 @@ class WebServer {
             String ret = "<hr><form method=\"get\">";
             ret += "<input type=\"hidden\" name=\"action\" value=\"updateVars\">" +
                     "<h3>YCSB Workload Settings</h3>" +
+		    "<button type=\"submit\">Update</button>" +
                     "<p>Target throughput (ops/s): <input type=\"text\" size=\"6\" name=\"target_thr_per_host\" value=\"" +
                     prop.getProperty("target_thr_per_host") + "\"></p>" +
                     "<p>Work phase duration (s): <input type=\"text\" size=\"6\" name=\"num_seconds_to_run\" value=\""
