@@ -24,7 +24,10 @@ public class RegularScoreFunction implements ScoreFunction {
         boolean aIsForward = aWriteFinish < aMaxReadStart;
         boolean bIsForward = bWriteFinish < bMaxReadStart;
 
-        if (aIsForward && bIsForward) {
+
+	if (a == b)
+	    return 0;
+        else if (aIsForward && bIsForward) {
             // two forward zones
             if (aMaxReadStart < bWriteFinish || bMaxReadStart < aWriteFinish) {
                 // no conflict

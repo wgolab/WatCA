@@ -1,6 +1,9 @@
 package ca.uwaterloo.watca;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,8 +73,16 @@ public class History {
         clusterSet.removeAll(deleteList);
     }
 
-    public List<Long> getScores(ScoreFunction sfn) {
-	return logScores(sfn, null);
+    public synchronized List<Long> getScores(ScoreFunction sfn) {
+	List<Long> ret;
+	try {
+	    PrintWriter out = new PrintWriter(new FileWriter("scores.txt", true));
+	    ret = logScores(sfn, out);
+	    out.close();
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+	return ret;
     }
 
     public List<Long> logScores(ScoreFunction sfn, PrintWriter out) {
@@ -84,9 +95,9 @@ public class History {
                     long newScore = Collections.max(sfn.getScores(a, b));
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);
+			if (out != null)
+			    out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                     }
-		    if (out != null)
-			out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                 } else if (a.overlaps(b)) {
                     long newScore = Collections.max(sfn.getScores(a, b));
                     if (newScore > 0) {
@@ -104,8 +115,9 @@ public class History {
             a.setScore(tempScore);            
             // Log scores
 	    if (tempScore == 0)
-		if (out != null)
-		    out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + tempScore);
+		if (out != null) {
+		    // out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + tempScore);
+		}
             
             ret.add(tempScore);
         }
