@@ -123,20 +123,20 @@ fun_load_ycsb() {
     echo "load phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
-        java -cp "../dist/Analysis.jar:../lib2/ycsb-cassandra-binding-0.7.0/*" \
+        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraClient10 \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
-            com.yahoo.ycsb.Client -load -db ca.waterloo.watca.YCSBConnectorWrapper \
+            com.yahoo.ycsb.Client -load -db ca.uwaterloo.watca.YCSBConnectorWrapper \
             -p maxexecutiontime=0 -P gen_file/workload".${myip}" \
             -threads $YCSB_threads_for_load \
             -s -p hosts=$myip
     elif [ "$type" == "Cassandra2_2" ];then
-        java -cp "../dist/Analysis.jar:../lib2/ycsb-cassandra2-binding-0.7.0/*" \
+        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraCQLClient \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
-            com.yahoo.ycsb.Client -load -db ca.waterloo.watca.YCSBConnectorWrapper \
+            com.yahoo.ycsb.Client -load -db ca.uwaterloo.watca.YCSBConnectorWrapper \
             -p maxexecutiontime=0 -P gen_file/workload".${myip}" \
             -threads $YCSB_threads_for_load \
             -s -p hosts=$myip
@@ -152,11 +152,11 @@ fun_work_ycsb() {
     echo "work phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
-        java -cp "../dist/Analysis.jar:../lib2/ycsb-cassandra-binding-0.7.0/*" \
+        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraClient10 \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
-            com.yahoo.ycsb.Client -t -db ca.waterloo.watca.YCSBConnectorWrapper \
+            com.yahoo.ycsb.Client -t -db ca.uwaterloo.watca.YCSBConnectorWrapper \
             -p maxexecutiontime=${num_seconds_to_run} -P gen_file/workload".${myip}" \
             -threads $YCSB_threads -target $target_thr_per_host \
             -p cassandra.readconsistencylevel=$read_consistency \
@@ -165,11 +165,11 @@ fun_work_ycsb() {
             -p readconprob=$con_prob -p writeconprob=$con_prob \
             -s -p hosts=$myip
     elif [ "$type" == "Cassandra2_2" ];then
-        java -cp "../dist/Analysis.jar:../lib2/ycsb-cassandra2-binding-0.7.0/*" \
+        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraCQLClient \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
-            com.yahoo.ycsb.Client -t -db ca.waterloo.watca.YCSBConnectorWrapper \
+            com.yahoo.ycsb.Client -t -db ca.uwaterloo.watca.YCSBConnectorWrapper \
             -p maxexecutiontime=${num_seconds_to_run} -P gen_file/workload".${myip}" \
             -threads $YCSB_threads -target $target_thr_per_host \
             -p cassandra.readconsistencylevel=$read_consistency \
