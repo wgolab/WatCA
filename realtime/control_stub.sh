@@ -95,15 +95,15 @@ fun_start_DB() {
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
         sed -e s/Seed_Ip_Address_Placeholder/"${seed}"/ \
-            -e s/Listen_Address_Placeholder/${myip}/ \
+            -e s/Listen_Address_Placeholder/""/ \
             -e s/Broadcast_Address_Placeholder/${public_ip}/ \
-            -e s/Rpc_Address_Placeholder/${myip}/ \
+            -e s/Rpc_Address_Placeholder/""/ \
             cassandra.v2_0_17.yaml > cassandra.yaml
     elif [ "$type" == "Cassandra2_2" ];then
         sed -e s/Seed_Ip_Address_Placeholder/"${seed}"/ \
-            -e s/Listen_Address_Placeholder/${myip}/ \
+            -e s/Listen_Address_Placeholder/""/ \
             -e s/Broadcast_Address_Placeholder/${public_ip}/ \
-            -e s/Rpc_Address_Placeholder/${myip}/ \
+            -e s/Rpc_Address_Placeholder/""/ \
             cassandra.v2_2_5.yaml > cassandra.yaml
     else
         echo "Error DB type: "$type
@@ -113,7 +113,7 @@ fun_start_DB() {
 
     # start server
     cd ${CassandraPath}/current-version/
-    bin/cassandra
+    bin/cassandra &> /var/log/cassandra/output.log
 }
 
 fun_load_ycsb() {

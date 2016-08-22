@@ -144,7 +144,7 @@ public class YCSBConnectorWrapper extends DB {
 
 	ret = innerDB.read(table, key, fields, result);
 	finish = System.currentTimeMillis();
-	String value = "key_not_found";
+	String value = "";
 	if (!result.isEmpty()) {
 	    ByteIterator b;
 	    if (connectorClassName.contains("CassandraCQLClient")) {

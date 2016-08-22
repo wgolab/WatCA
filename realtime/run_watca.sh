@@ -17,6 +17,8 @@ rm gen_file/*
 bash sync_files.sh init
 
 
+# This file grows without bound!
+rm scores.txt
 export CLASSPATH=../target/classes/
 # TODO Hua args "localhost 12347 javaControl" is meaning less, for historical reason, will be cleaned up
 java ca.uwaterloo.watca.RealtimeMain $ServerLogPort $WebPort localhost 12347 javaControl
