@@ -2,7 +2,7 @@
 
 ## Overview
 WatCA is a tool for analyzing consistency in distributed storage systems and in concurrent data structures.
-The current version supports key-value storage systems (e.g., Cassandra, Riak) that support read and write (i.e., get and put) operations
+The current version supports key-value storage systems (e.g., Cassandra, Riak) that provide read and write (i.e., get and put) operations
 and detects violations of [Herlihy and Wing's linearizability property](http://dl.acm.org/citation.cfm?id=78972).
 The input to the tool is a log file that records the invocation and response of every operation applied
 to the storage system, whose format is described below.
