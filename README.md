@@ -37,12 +37,27 @@ Java process, as otherwise timestamps obtained using System.nanoTime() are incom
 
 **Note:** If a get operation fails to find a value for a given key, the corresponding log record should record a blank value.
 
-## How-to (Linux)
+## How-to: offline analysis
+Instructions for Linux (tested on Ubuntu 14.04):
+
 1. git clone https://github.com/wgolab/WatCA.git
 2. cd WatCA; mvn install
 3. cp samplelogs/execution.log.negative execution.log
 4. ./lintest.sh
 5. cat scores.txt
+
+## How-to: real-time analysis
+WatCA can be attached directly to a live NoSQL storage system for real-time consistency analysis.
+The real-time analyzer provides a graphical interface using an embedded web server.
+For details please navigate to the [realtime](realtime/) subdirectory.
+
+![WatCA GUI](realtime/watca_gui.png "WatCA GUI")
+
+
+**Note:** The real-time tool uses an older log format in which the invocation and response
+events for an operation are represented using a single log record.
+As a result, the real-time tool cannot deal correctly with operations that are
+interrupted by failures.  Support for the new log format is coming soon.
 
 ## Development Team
 - Hua Fan - PhD candidate
