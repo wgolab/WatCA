@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ScriptHostWatcaPath=~/code/WatCA
-ScriptHostCassandraPath=~/cassandra
+ScriptHostCassandraPath=~/code/WatCA/realtime/cassandra
 WatcaPath=/home/ubuntu/ConAnalysis
 CassandraPath=/home/ubuntu/cassandra
 CassandraDataPath=/var/lib/cassandra/
