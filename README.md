@@ -48,7 +48,7 @@ Instructions for Linux (tested on Ubuntu 14.04):
 
 ## How-to: real-time analysis
 WatCA can be attached directly to a live NoSQL storage system for real-time consistency analysis.
-The real-time analyzer provides a [graphical interface] using an embedded web server.
+The real-time analyzer provides a graphical interface using an embedded web server.
 For details please navigate to the [realtime](realtime/) subdirectory.
 
 ![WatCA GUI](watca_gui.png "WatCA GUI")
