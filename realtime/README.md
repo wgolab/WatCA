@@ -1,3 +1,7 @@
+# Real-time consistency analysis using WatCA
+
+**Instructions for EC2, Ubuntu 14.04 server, Cassandra 2.2.7, YCSB 0.10.0**
+
 Step 0: SSH agent
 
 - Launch an ssh agent for passwordless authentication with EC2 hosts.
@@ -14,22 +18,22 @@ Step 2: Prepare security group
 
 Step 3: Obtain list of host IPs
 
-- Place the public IPs in servers_ec2, one per line.
-- Place public/private IP pairs in servers_ec2_public_private, one pair per line, elements of a pair separated by a space.
+- Place the public IPs in `servers_ec2`, one per line.
+- Place public/private IP pairs in `servers_ec2_public_private`, one pair per line, elements of a pair separated by a space.
 
 Step 4: Storage system setup
 
-- Run the setup_ubuntu_cluster.sh script.
-- Alternatively, at each host clone the git repository and then execute setup_ubuntu.sh to download and install Cassandra.
+- Run the `setup_ubuntu_cluster.sh` script.
+- Alternatively, at each host clone the git repository and then execute `setup_ubuntu.sh` to download and install Cassandra.
 - Most of the installation is non-interactive, but be prepared to accept the Oracle Java license agreement at each host.
-- Double-check that Cassandra got installed.  Update the CVER variable in setup_ubuntu.sh if you get an HTTP 404 response when downloading Cassandra.
+- Double-check that Cassandra got installed.  Update the `CVER` variable in `setup_ubuntu.sh` if you get an HTTP 404 response when downloading Cassandra.
 
 Step 5: Configure tool
 
-- Edit settings.sh.
+- Edit `settings.sh`.
 - Override the first two settings, try to use defaults for the others.
 
 Step 6: Launch tool
 
-- Run run_watca.sh, and wait a few seconds for the tool to initialize before opening a browser to connect to the web interface.
+- Run `run_watca.sh`, and wait a few seconds for the tool to initialize before opening a browser to connect to the web interface.
 - By default, the web interface binds to port 12346.
