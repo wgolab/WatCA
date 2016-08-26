@@ -18,9 +18,8 @@ Step 2: Prepare security group
 
 Step 3: Obtain list of host IPs
 
-- Place the public IPs in `servers_public`, one per line.
-- Place public/private IP pairs in `servers_public_private`, one pair per line, elements of a pair separated by a space.
-- Use provided scripts (e.g., configure_ips_azure.sh) 
+- Use the provided scripts (e.g., `configure_ips_azure.sh`, `configure_ips_ec2.sh`) to determine public and private IPs of your VMs.  Configure `azure_resource_groups` or `ec_regions` prior to running these scripts.
+- Alternatively, populate the `servers_public` and `servers_public_private` file manually.
 
 Step 4: Storage system setup
 

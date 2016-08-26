@@ -5,6 +5,10 @@ rm -f servers_public
 rm -f servers_public_private
 
 echo
+echo Note: run \"azure login\" first!
+echo
+
+echo
 echo Reading list of resource groups from azure_resource_groups
 echo
 

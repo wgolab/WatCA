@@ -5,6 +5,10 @@ rm -f servers_public
 rm -f servers_public_private
 
 echo
+echo Note: configure your AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables first!
+echo
+
+echo
 echo Reading list of EC2 regions for ec2_regions
 echo
 
