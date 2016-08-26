@@ -14,7 +14,7 @@ fi
 
 
 seq=0
-for host in `cat servers_ec2`
+for host in `cat servers_public`
 do
     echo "sync files for ${host}"
     if [ "$arg1" == "init" ];then

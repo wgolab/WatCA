@@ -11,7 +11,7 @@ fun_init_schema() {
 
     sleep 5
     upNum=`cd ${CassandraPath}/current-version && bin/nodetool status | grep UN | wc -l`
-    totalNum=`cat servers_ec2 | wc -l`
+    totalNum=`cat servers_public | wc -l`
     while [[ $upNum != $totalNum ]];do
         echo "started "${upNum}" servers out of "${totalNum}
         sleep 3
@@ -20,7 +20,7 @@ fun_init_schema() {
     echo "started "${upNum}" servers out of "${totalNum}
 
     public_ip=`cat gen_file/myIP`
-    ip=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+    ip=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
     #ip=`cat gen_file/myIP`
     type=$storage_type
     sed -e s/Replication_Factor_Placeholder/${replication_factor}/ \
@@ -43,7 +43,7 @@ fun_init_schema() {
     done
 
     echo "Schema updated, waiting for servers to synchronize schema"
-    for host in `cat servers_ec2`
+    for host in `cat servers_public`
     do
         result=0
         while [[ $result != 1 ]];do
@@ -82,16 +82,16 @@ fun_start_DB() {
     # create yaml file
     # TODO Hua when geo_replication private ip and ip will be different at
     # listen_address
-    seed=`head -n 1 servers_ec2`
+    seed=`head -n 1 servers_public`
     # cassandra does not allows concurrent join, we set all server as seed
-    for host in `tail servers_ec2 -n +2`
+    for host in `tail servers_public -n +2`
     do
         seed="$seed, $host"
     done
 
     #myip=`cat gen_file/myIP`
     public_ip=`cat gen_file/myIP`
-    myip=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+    myip=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
         sed -e s/Seed_Ip_Address_Placeholder/"${seed}"/ \
@@ -119,7 +119,7 @@ fun_start_DB() {
 fun_load_ycsb() {
     #myip=`cat gen_file/myIP`
     public_ip=`cat gen_file/myIP`
-    myip=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+    myip=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
     echo "load phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
@@ -148,7 +148,7 @@ fun_load_ycsb() {
 fun_work_ycsb() {
     #myip=`cat gen_file/myIP`
     public_ip=`cat gen_file/myIP`
-    myip=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+    myip=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
     echo "work phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then

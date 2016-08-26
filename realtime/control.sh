@@ -19,7 +19,7 @@ run_on_servers() {
     fi
     #echo "Tunnel options: $tunnelopts"
 
-    for host in `cat servers_ec2`
+    for host in `cat servers_public`
     do
         touch STATE/${host}"."${signature}".ing"
         (ssh -ax $tunnelopts $RemoteUser@${host} "${cmd}" 1> "STATE/${host}.${signature}.out" `
@@ -91,7 +91,7 @@ start_DB() {
     # the last parameter is not 1, because server will continue running
     run_on_servers "${cmd}" "startDB" 0
 
-    seed=`head -n 1 servers_ec2`
+    seed=`head -n 1 servers_public`
     ssh -ax $RemoteUser@${seed} "cd ${shellPath} && bash control_stub.sh init_schema"
 
     echo "NoSQL DB server started."
@@ -100,15 +100,15 @@ start_DB() {
 load_YCSB() {
 
     echo "Generate partion workload files"
-    serverNum=`cat servers_ec2 | wc -l`
+    serverNum=`cat servers_public | wc -l`
     countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
 
     start=0
 
-    for public_ip in `cat servers_ec2`
+    for public_ip in `cat servers_public`
     do
-	host=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
         sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
@@ -135,15 +135,15 @@ load_YCSB() {
 
 work_YCSB() {
     echo "Generate partion workload files"
-    serverNum=`cat servers_ec2 | wc -l`
+    serverNum=`cat servers_public | wc -l`
     countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
 
     start=0
 
-    for public_ip in `cat servers_ec2`
+    for public_ip in `cat servers_public`
     do
-	host=`cat servers_ec2_public_private | grep $public_ip | awk '{print $2}'`
+	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
         sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \

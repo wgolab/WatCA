@@ -1,15 +1,15 @@
 # Real-time consistency analysis using WatCA
 
-**Instructions for EC2, Ubuntu 14.04 server, Cassandra 2.2.7, YCSB 0.10.0**
+**Instructions for EC2 and Azure, Ubuntu 14.04 server, Cassandra 2.2.7, YCSB 0.10.0**
 
 Step 0: SSH agent
 
-- Launch an ssh agent for passwordless authentication with EC2 hosts.
+- Launch an ssh agent for passwordless authentication with VMs.
 
 Step 1: Launch instances
 
-- Launch Ubuntu 14.04 (64-bit) instances in EC2 in one or more geographical regions.
-- Use the default security group.
+- Launch Ubuntu 14.04 (64-bit) instances in one or more geographical regions.
+- Use the default security group in EC2.
 
 Step 2: Prepare security group
 
@@ -18,8 +18,9 @@ Step 2: Prepare security group
 
 Step 3: Obtain list of host IPs
 
-- Place the public IPs in `servers_ec2`, one per line.
-- Place public/private IP pairs in `servers_ec2_public_private`, one pair per line, elements of a pair separated by a space.
+- Place the public IPs in `servers_public`, one per line.
+- Place public/private IP pairs in `servers_public_private`, one pair per line, elements of a pair separated by a space.
+- Use provided scripts (e.g., configure_ips_azure.sh) 
 
 Step 4: Storage system setup
 

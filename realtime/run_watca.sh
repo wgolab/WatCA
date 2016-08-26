@@ -11,7 +11,7 @@ bash build.sh
 
 cd $DIR
 # this line is only needed in the first time of running to send files.
-echo "Make sure the file servers_ec2 have changed with the host ip addresses"
+echo "Make sure the file servers_public have changed with the host ip addresses"
 rm STATE/*
 rm gen_file/*
 bash sync_files.sh init
