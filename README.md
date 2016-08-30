@@ -16,7 +16,7 @@ Each line has the following general format:
 The **timestamp** identifies each event uniquely.  The log file must be sorted in ascending order by timestamp.
 **INV|RES** denotes the event type (invocation vs. response).
 The **client_ID** corresponds to a process ID in Herlihy and Wing's model, and should be distinct
-for each client pr  ocess and thread.  You can construct it by concatenating the client's IP,
+for each client process and thread.  You can construct it by concatenating the client's IP,
 process ID, and thread ID.
 **R|W** denotes the operation type (read/get vs. write/put).
 The **key** and **value** denote the key-value pair, and must not contain any tabs.
