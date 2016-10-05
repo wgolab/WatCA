@@ -89,7 +89,7 @@ public class LogParser {
                     bufferedLines.add(logLine);
                 }else if (logLine.eType == EventType.RESPONSE) {
                     Optional<OperationLogLine> invokingLine
-			= bufferedLines.stream().filter(o -> o.processID.equals(logLine.processID) && o.oType == logLine.oType && o.eType == EventType.INVOKE).reduce((first, second) -> second); // must process entries in reverse order
+			= bufferedLines.stream().filter(o -> o.processID.equals(logLine.processID) && o.oType == logLine.oType && o.eType == EventType.INVOKE && o.key.equals(logLine.key)).reduce((first, second) -> second); // must process entries in reverse order
                     
                     if (invokingLine.isPresent()) {
                        if (logLine.oType == OperationType.READ) {
