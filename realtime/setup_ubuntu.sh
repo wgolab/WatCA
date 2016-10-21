@@ -4,14 +4,16 @@
 CVER=2.2.7
 YCSBVER=0.10.0
 
+
 sudo apt-get -y update
 sudo apt-get -y install build-essential
 
 # install java 8
-sudo add-apt-repository ppa:webupd8team/java
-sudo apt-get -y update
-sudo apt-get -y install oracle-java8-installer
-sudo apt-get -y install oracle-java8-set-default
+#sudo add-apt-repository ppa:webupd8team/java
+#sudo apt-get -y update
+#sudo apt-get -y install oracle-java8-installer
+#sudo apt-get -y install oracle-java8-set-default
+sudo apt-get install openjdk-8-jdk
 # test
 java -version
 sudo apt-get -y install ntp
