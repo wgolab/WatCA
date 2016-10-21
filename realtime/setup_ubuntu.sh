@@ -18,6 +18,13 @@ sudo apt-get install openjdk-8-jdk
 java -version
 sudo apt-get -y install ntp
 
+
+# install python and cassandra driver
+sudo apt-get -y install python
+sudo apt-get install -y python-pip
+sudo pip install cqlsh
+
+
 # install cassandra
 mkdir -p ~/cassandra
 cd  ~/cassandra

@@ -29,6 +29,7 @@ fun_init_schema() {
 
     while [[ $result != 1 ]];do
         echo "Begin to init schema of cassandra on seed"
+	export CQLSH_NO_BUNDLED=true
         if [ "$type" == "Cassandra2_0" ];then
             ${CassandraPath}/current-version/bin/cassandra-cli -h $ip -f gen_file/cassandra.cql.script1
             result=`${CassandraPath}/current-version/bin/cqlsh $ip -e "SELECT * FROM system.schema_keyspaces" | grep usertable | wc -l`
@@ -48,6 +49,7 @@ fun_init_schema() {
         result=0
         while [[ $result != 1 ]];do
             echo "waiting for host: "${host}
+	    export CQLSH_NO_BUNDLED=true
             if [ "$type" == "Cassandra2_0" ];then
                 result=`${CassandraPath}/current-version/bin/cqlsh $host -e "SELECT * FROM system.schema_keyspaces" | grep usertable | wc -l`
             elif [ "$type" == "Cassandra2_2" ];then
