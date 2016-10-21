@@ -2,7 +2,7 @@
 
 USR=ubuntu
 
-echo Make sure your servers_public and servers_public_private files are populated with IPs!
+echo Make sure your servers_public file is populated with IPs!
 
 for S in `cat servers_public`
 do
