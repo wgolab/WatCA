@@ -6,8 +6,7 @@ echo Host: ${HOSTNAME} / ${THISHOSTIP}
 #!/bin/bash
 
 USR=ubuntu
-rm -f servers_public
-rm -f servers_public_private
+
 
 echo
 echo Note: configure your AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables first!
