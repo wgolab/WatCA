@@ -47,9 +47,10 @@ control_kernel_net_delay() {
     delay=$kernel_net_delay
     if [ $delay == 0 ];then
         echo "Resetting simulated network delay"
-        cmd="sudo tc qdisc del dev eth0 root netem"
+        cmd="sudo tc qdisc del dev \`ifconfig | grep Ethernet | cut -d' ' -f1\` root"
     else
-        cmd="sudo tc qdisc del dev eth0 root netem; sudo tc qdisc add dev eth0 root netem delay "${delay}"ms"
+        echo "Setting simulated network delay to ${delay}ms"
+        cmd="sudo tc qdisc del dev \`ifconfig | grep Ethernet | cut -d' ' -f1\` root; sudo tc qdisc add dev \`ifconfig | grep Ethernet | cut -d' ' -f1\` root netem delay "${delay}"ms"
     fi
     echo $cmd
 
