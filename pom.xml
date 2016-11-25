@@ -19,5 +19,12 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>ycsb</groupId>
+      <artifactId>ycsb</artifactId>
+      <version>0.7.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/core-0.7.0.jar</systemPath>
+    </dependency>
   </dependencies>
 </project>
