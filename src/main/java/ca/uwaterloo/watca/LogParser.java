@@ -62,6 +62,11 @@ public class LogParser {
                 if (words.length >= 6)
                     this.value = words[count++];               
             }
+        }     
+        
+        public boolean isCandidateInvokingLine (OperationLogLine line) {
+            return (processID == line.processID && oType == line.oType
+                    && eType == line.eType && key.equals(line.key));
         }
     }
 
@@ -89,7 +94,7 @@ public class LogParser {
                     bufferedLines.add(logLine);
                 }else if (logLine.eType == EventType.RESPONSE) {
                     Optional<OperationLogLine> invokingLine
-			= bufferedLines.stream().filter(o -> o.processID.equals(logLine.processID) && o.oType == logLine.oType && o.eType == EventType.INVOKE && o.key.equals(logLine.key)).reduce((first, second) -> second); // must process entries in reverse order
+			= bufferedLines.stream().filter(o -> o.isCandidateInvokingLine(logLine)).reduce((first, second) -> second); // must process entries in reverse order
                     
                     if (invokingLine.isPresent()) {
                        if (logLine.oType == OperationType.READ) {

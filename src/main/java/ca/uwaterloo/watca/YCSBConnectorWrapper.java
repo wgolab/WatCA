@@ -18,14 +18,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
- * @author Wojciech Golab
+ * @author Wojciech Golab, Shankha Subhra Chatterjee
  */
 public class YCSBConnectorWrapper extends DB {
 
     static private final String KEY_NOT_FOUND = "key_not_found";
     static private final String NO_DATA = "no_data";
     static private final Lock lock = new ReentrantLock();
-    static private BufferedWriter out;
+    static private BufferedWriter streamWriter;
+    static private BufferedWriter fileWriter;
     static private int numThreads = 0;
     private DB innerDB;
     static private long readDelay;
@@ -68,7 +69,7 @@ public class YCSBConnectorWrapper extends DB {
                 startTime = System.currentTimeMillis();
             }
 
-            if (out == null) {
+            if (streamWriter == null) {
                 readDelay = Integer.parseInt(getProperties().getProperty("readdelay", "0"));
                 writeDelay = Integer.parseInt(getProperties().getProperty("writedelay", "0"));
                 System.out.println("Read delay: " + readDelay);
@@ -78,16 +79,16 @@ public class YCSBConnectorWrapper extends DB {
                 String logHost = System.getProperties().getProperty("analysis.LogHost");
                 String logPort = System.getProperties().getProperty("analysis.LogPort");
                 String logFileName = System.getProperties().getProperty("analysis.LogFile");
-                if (logHost == null || logPort == null) {
-		    System.out.println("Opening log file: " + logFileName);
-                    out = new BufferedWriter(new FileWriter(logFileName, true));
-		    System.out.println("Opened log file: " + logFileName);
-                } else {
-		    System.out.println("Opening log stream: " + logHost + ":" + logPort);
-                    Socket socket = new Socket(logHost, Integer.parseInt(logPort));
-                    out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-		    System.out.println("Opened log stream: " + logHost + ":" + logPort);
-                }
+
+                System.out.println("Opening log file: " + logFileName);
+                fileWriter = new BufferedWriter(new FileWriter(logFileName, true));
+                System.out.println("Opened log file: " + logFileName);
+
+                System.out.println("Opening log stream: " + logHost + ":" + logPort);
+                Socket socket = new Socket(logHost, Integer.parseInt(logPort));
+                streamWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                System.out.println("Opened log stream: " + logHost + ":" + logPort);
+
                 numThreads++;
             }
         } catch (IOException e) {
@@ -103,8 +104,8 @@ public class YCSBConnectorWrapper extends DB {
         innerDB.cleanup();
         try {
             lock.lock();
-            if (out != null) {
-                out.flush();
+            if (streamWriter != null) {
+                streamWriter.flush();
             }
         } catch (IOException e) {
             throw new DBException("Unable to flush consistency log file.", e);
@@ -118,8 +119,8 @@ public class YCSBConnectorWrapper extends DB {
         try {
             try {
                 lock.lock();
-                if (out != null) {
-                    out.close();
+                if (streamWriter != null) {
+                    streamWriter.close();
                 }
             } catch (IOException e) {
                 throw new RuntimeException("Unable to close consistency log file.", e);
@@ -135,6 +136,7 @@ public class YCSBConnectorWrapper extends DB {
     public Status read(String table, String key, Set<String> fields, HashMap<String, ByteIterator> result) {
         long start, finish;
         start = System.currentTimeMillis();
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "R", key, "");
         try {
             Thread.sleep(readDelay);
         } catch (InterruptedException ex) {
@@ -155,11 +157,10 @@ public class YCSBConnectorWrapper extends DB {
 		b = result.get(result.keySet().iterator().next());
 	    }
 	    value = new String(b.toArray());
-	}
-	long endTime = System.currentTimeMillis();
-	// only log operations that return proper values
-	//if (!value.equals("key_not_found"))
-	logOperation("R", key, value, start, finish);
+	}	
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "R", key, value);
+        logOperation("R", key, value, start, finish);
+	
         return ret;
     }
 
@@ -171,15 +172,17 @@ public class YCSBConnectorWrapper extends DB {
     @Override
     public Status update(String table, String key, HashMap<String, ByteIterator> values) {
         long start, finish;
-        start = System.currentTimeMillis();
+        start = System.currentTimeMillis();        
         HashMap<String, String> values2 = StringByteIterator.getStringMap(values);
+        String value = values2.get(values2.keySet().iterator().next());        
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value);
         Status ret = innerDB.update(table, key, StringByteIterator.getByteIteratorMap(values2));
         try {
             Thread.sleep(writeDelay);
         } catch (InterruptedException ex) {
         }
-        finish = System.currentTimeMillis();
-        String value = values2.get(values2.keySet().iterator().next());
+        finish = System.currentTimeMillis();        
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "");
         logOperation("U", key, value, start, finish);
         return ret;
     }
@@ -189,13 +192,15 @@ public class YCSBConnectorWrapper extends DB {
         long start, finish;
         start = System.currentTimeMillis();
         HashMap<String, String> values2 = StringByteIterator.getStringMap(values);
+        String value = values2.get(values2.keySet().iterator().next());
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value);
         Status ret = innerDB.insert(table, key, StringByteIterator.getByteIteratorMap(values2));
         try {
             Thread.sleep(writeDelay);
         } catch (InterruptedException ex) {
         }
         finish = System.currentTimeMillis();
-        String value = values2.get(values2.keySet().iterator().next());
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "");
         logOperation("I", key, value, start, finish);
         return ret;
     }
@@ -208,23 +213,23 @@ public class YCSBConnectorWrapper extends DB {
     private void logOperation(String operationType, String key, String value, long startTime, long finishTime) {
         try {
             lock.lock();
-            if (out != null) {
-                out.write(key);
-                out.write("\t");
+            if (streamWriter != null) {
+                streamWriter.write(key);
+                streamWriter.write("\t");
                 if (value.equals(KEY_NOT_FOUND)) {
-                    out.write(KEY_NOT_FOUND);
+                    streamWriter.write(KEY_NOT_FOUND);
                 } else if (value.equals("")) {
-                    out.write(NO_DATA);
+                    streamWriter.write(NO_DATA);
                 } else {
-                    out.write(sha1(value));
+                    streamWriter.write(sha1(value));
                 }
-                out.write("\t");
-                out.write(String.valueOf(startTime));
-                out.write("\t");
-                out.write(String.valueOf(finishTime));
-                out.write("\t");
-                out.write(operationType);
-                out.newLine();
+                streamWriter.write("\t");
+                streamWriter.write(String.valueOf(startTime));
+                streamWriter.write("\t");
+                streamWriter.write(String.valueOf(finishTime));
+                streamWriter.write("\t");
+                streamWriter.write(operationType);
+                streamWriter.newLine();
             }
         } catch (Exception e) {
             String logFileName = System.getProperties().getProperty("analysis.LogFile");
@@ -234,7 +239,36 @@ public class YCSBConnectorWrapper extends DB {
             lock.unlock();
         }
     }
-
+    
+    private void logEventToFile(long time, String eventType, long processId, String operationType, String key, String value){
+        try {
+            lock.lock();
+            if (fileWriter != null){
+                fileWriter .write(String.valueOf(time));
+                fileWriter.write("\t");
+                fileWriter .write(String.valueOf(eventType));
+                fileWriter.write("\t");
+                fileWriter .write(String.valueOf(processId));
+                fileWriter.write("\t");
+                fileWriter.write(operationType);
+                fileWriter.write("\t");
+                fileWriter.write(key);
+                fileWriter.write("\t");
+                if (operationType.equals("W") && !value.isEmpty()){
+                    fileWriter.write(value);
+                    fileWriter.write("\t");
+                }
+                streamWriter.newLine();
+            }
+        }catch (Exception e) {
+            String logFileName = System.getProperties().getProperty("analysis.LogFile");
+            e.printStackTrace();
+            throw new RuntimeException("Unable to write consistency log file " + logFileName, e);
+        } finally {
+            lock.unlock();
+        }
+    }
+    
     private static String sha1(String input) throws NoSuchAlgorithmException {
         MessageDigest mDigest = MessageDigest.getInstance("SHA1");
         byte[] result = mDigest.digest(input.getBytes());
