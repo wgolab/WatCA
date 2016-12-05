@@ -254,11 +254,11 @@ public class YCSBConnectorWrapper extends DB {
                 fileWriter.write("\t");
                 fileWriter.write(key);
                 fileWriter.write("\t");
-                if (operationType.equals("W") && !value.isEmpty()){
-                    fileWriter.write(value);
+                if (!value.isEmpty()){
+                    fileWriter.write(sha1(value));
                     fileWriter.write("\t");
                 }
-                streamWriter.newLine();
+                fileWriter.newLine();
             }
         }catch (Exception e) {
             String logFileName = System.getProperties().getProperty("analysis.LogFile");
