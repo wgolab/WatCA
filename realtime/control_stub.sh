@@ -125,7 +125,7 @@ fun_load_ycsb() {
     echo "load phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
-        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
+        java -cp "../target/classes/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraClient10 \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
@@ -134,7 +134,7 @@ fun_load_ycsb() {
             -threads $YCSB_threads_for_load \
             -s -p hosts=$myip
     elif [ "$type" == "Cassandra2_2" ];then
-        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
+        java -cp "../target/classes/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraCQLClient \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
@@ -154,7 +154,7 @@ fun_work_ycsb() {
     echo "work phase of ycsb:"$myip
     type=$storage_type
     if [ "$type" == "Cassandra2_0" ];then
-        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
+        java -cp "../target/classes/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraClient10 \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
@@ -167,7 +167,7 @@ fun_work_ycsb() {
             -p readconprob=$con_prob -p writeconprob=$con_prob \
             -s -p hosts=$myip
     elif [ "$type" == "Cassandra2_2" ];then
-        java -cp "ycsb_wrapper/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
+        java -cp "../target/classes/:${YCSBPath}/current-version/lib/*:${YCSBPath}/current-version/cassandra2-binding/lib/*" \
             -Danalysis.ConnectorClass=com.yahoo.ycsb.db.CassandraCQLClient \
             -Danalysis.LogFile=/tmp/not_need_log_file.log \
             -Danalysis.LogHost=localhost  -Danalysis.LogPort=${ServerLogPort} \
