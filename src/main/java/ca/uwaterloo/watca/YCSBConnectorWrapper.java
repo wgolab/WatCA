@@ -248,7 +248,7 @@ public class YCSBConnectorWrapper extends DB {
                 fileWriter.write("\t");
                 fileWriter .write(String.valueOf(eventType));
                 fileWriter.write("\t");
-                fileWriter .write(String.valueOf(processId));
+                fileWriter.write(String.valueOf(processId));
                 fileWriter.write("\t");
                 fileWriter.write(operationType);
                 fileWriter.write("\t");
@@ -258,7 +258,7 @@ public class YCSBConnectorWrapper extends DB {
                     fileWriter.write(value);
                     fileWriter.write("\t");
                 }
-                streamWriter.newLine();
+                fileWriter.newLine();
             }
         }catch (Exception e) {
             String logFileName = System.getProperties().getProperty("analysis.LogFile");

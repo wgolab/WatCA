@@ -44,29 +44,39 @@ public class LogParser {
         OperationType oType;
         String key;
         String value;
+        boolean isValid;        
         
-        // TODO : Assumes the log files are well formed, and the key/values do not have whitespaces between them
-        //        Have to introduce error checking
-        public OperationLogLine(String line) {
+        public OperationLogLine(String line) {            
+            time = "";
+            processID = "";
+            key = "";
+            value = "";
+            isValid = true;
             String[] words = line.split("\\s+");
             int count = 0;
-            if(words.length >= 4)
+            if(words.length >= 5)
             {
                 this.time = words[count++];
                 this.eType = EventType.getType(words[count++]);
                 this.processID = words[count++];
-                this.oType = OperationType.getType(words[count++]);
+                this.oType = OperationType.getType(words[count++]);               
+		this.key = words[count++];
                 
-                if (words.length >= 5)
-		    this.key = words[count++];
-                if (words.length >= 6)
-                    this.value = words[count++];               
+                if ((this.oType == OperationType.READ && this.eType == EventType.RESPONSE) || 
+                        (this.oType == OperationType.WRITE && this.eType == EventType.INVOKE)) {
+                    if (words.length >= 6)
+                        this.value = words[count++];
+                    else 
+                        this.isValid = false;
+                }                              
             }
+            else 
+                isValid = false;
         }     
         
         public boolean isCandidateInvokingLine (OperationLogLine line) {
-            return (processID == line.processID && oType == line.oType
-                    && eType == line.eType && key.equals(line.key));
+            return (processID.equals(line.processID) && oType == line.oType
+                   && key.equals(line.key));
         }
     }
 
@@ -76,19 +86,25 @@ public class LogParser {
         bufferedLines = new ArrayList();
     }
     
+    public List<Operation> parseFiles (File[] files) throws IOException {
+        List<Operation> operations = new ArrayList();
+        for (File f : files ){
+            operations.addAll(parseFile(f));
+        }
+        return operations;
+    }    
+    
     // parameter 'filename' corresponds to the fully qualified filename, including path
-    public List<Operation> parse(String filename) throws IOException {        
+    public List<Operation> parseFile(File f) throws IOException {        
         List<Operation> operations = new ArrayList();
         
-        try {            
-            FileInputStream fstream = new FileInputStream(filename);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-            
+        try {           
+            BufferedReader br = new BufferedReader(new FileReader(f));            
             String line;
             while ((line = br.readLine()) != null) {
                 OperationLogLine logLine = new OperationLogLine(line);                
-                if (logLine.time == null)
-                    continue; // not a valid line
+                if (!logLine.isValid)
+                    continue;
                 
                 if (logLine.eType == EventType.INVOKE) {
                     bufferedLines.add(logLine);

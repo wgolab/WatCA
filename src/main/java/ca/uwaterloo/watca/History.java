@@ -77,7 +77,7 @@ public class History {
 	List<Long> ret;
 	try {
 	    PrintWriter out = new PrintWriter(new FileWriter("scores.txt", true));
-	    ret = logScores(sfn, out);
+	    ret = logScores(sfn, out, false);
 	    out.close();
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
@@ -85,7 +85,7 @@ public class History {
 	return ret;
     }
 
-    public List<Long> logScores(ScoreFunction sfn, PrintWriter out) {
+    public List<Long> logScores(ScoreFunction sfn, PrintWriter out, boolean showZeroScores) {
         List<Long> ret = new ArrayList();
         for (Cluster a : clusterSet) {
             long tempScore = a.getScore();
@@ -93,32 +93,26 @@ public class History {
             for (Cluster b : tail) {
                 if (a == b) {
                     long newScore = Collections.max(sfn.getScores(a, b));
+                    if (out != null && (showZeroScores || newScore > 0))
+                        out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
-                        tempScore = Math.max(tempScore, newScore);
-			if (out != null)
-			    out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
+                        tempScore = Math.max(tempScore, newScore);			
                     }
                 } else if (a.overlaps(b)) {
                     long newScore = Collections.max(sfn.getScores(a, b));
+                    if (out != null && (showZeroScores || newScore > 0))
+                        out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);
                         if (b.getScore() < newScore) {
                             b.setScore(newScore);
-                        }
-			if (out != null)
-			    out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
+                        }			
                     }
                 } else {
                     break;
                 }
             }
-            a.setScore(tempScore);            
-            // Log scores
-	    if (tempScore == 0)
-		if (out != null) {
-		    // out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + tempScore);
-		}
-            
+            a.setScore(tempScore);       
             ret.add(tempScore);
         }
         return ret;

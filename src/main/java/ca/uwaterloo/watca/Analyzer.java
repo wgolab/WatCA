@@ -22,15 +22,17 @@ public class Analyzer {
     private final List<Operation> operations;
     private ConcurrentHashMap<String, History> keyHistMap;
     private ScoreFunction sfn;
-    
+    private boolean showZeroScores;
     private String logfile;
     
-    public Analyzer(String filename) {
+    public Analyzer(String filename, boolean s) {
         operations = new ArrayList();
         keyHistMap = new ConcurrentHashMap<>();
         // default score function
-        sfn = new GKScoreFunction();
+        //sfn = new GKScoreFunction();
+        sfn = new RegularScoreFunction();
         logfile = filename;
+        showZeroScores = s;
     }
     
     public void computeMetrics() throws IOException {        
@@ -76,7 +78,7 @@ public class Analyzer {
         ConcurrentMap<String, List<Long>> keyScoreMap = new ConcurrentHashMap();
         // ScoreFunction sfn = new RegularScoreFunction();
         keyHistMap.entrySet().parallelStream().forEach((e) -> {
-            keyScoreMap.put(e.getKey(), e.getValue().logScores(sfn, logWriter));
+            keyScoreMap.put(e.getKey(), e.getValue().logScores(sfn, logWriter, showZeroScores));
         });
         
         logWriter.close();
