@@ -22,6 +22,9 @@ public class History {
     private String key;
     private SortedMap<String, Cluster> clusterMap;
     private SortedSet<Cluster> clusterSet;
+    
+    private int noOfScores;
+    private int noOfPosScores;
 
     public History(String key) {
         this.key = key;
@@ -33,10 +36,21 @@ public class History {
 	initCluster.addOperation(initWrite);
 	clusterMap.put(INITIAL_VALUE, initCluster);
 	clusterSet.add(initCluster);
+        
+        noOfScores = 0;
+        noOfPosScores = 0;
     }
 
     public String getKey() {
         return key;
+    }
+    
+    public int getNoOfScores() {
+        return noOfScores;
+    }
+    
+    public int getNoOfPosScores() {
+        return noOfPosScores;
     }
 
     public void addOperation(Operation op) {
@@ -85,6 +99,7 @@ public class History {
 	return ret;
     }
 
+    // TODO : Change percentage of inconsistent operations caculation to per value
     public List<Long> logScores(ScoreFunction sfn, PrintWriter out, boolean showZeroScores) {
         List<Long> ret = new ArrayList();
         for (Cluster a : clusterSet) {
@@ -93,20 +108,24 @@ public class History {
             for (Cluster b : tail) {
                 if (a == b) {
                     long newScore = Collections.max(sfn.getScores(a, b));
+                    noOfScores++;
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
-                        tempScore = Math.max(tempScore, newScore);			
+                        tempScore = Math.max(tempScore, newScore);
+                        noOfPosScores++;
                     }
                 } else if (a.overlaps(b)) {
                     long newScore = Collections.max(sfn.getScores(a, b));
+                    noOfScores++;
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);
                         if (b.getScore() < newScore) {
                             b.setScore(newScore);
-                        }			
+                        }
+                        noOfPosScores++;
                     }
                 } else {
                     break;

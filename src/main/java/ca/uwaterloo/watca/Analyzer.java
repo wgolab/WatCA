@@ -3,6 +3,7 @@ package ca.uwaterloo.watca;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -24,8 +25,10 @@ public class Analyzer {
     private ScoreFunction sfn;
     private boolean showZeroScores;
     private String logfile;
+    private String outPath;    
+    private static String propFileName = "/proportions.log"; 
     
-    public Analyzer(String filename, boolean s) {
+    public Analyzer(String filename, boolean s, String outputPath) {
         operations = new ArrayList();
         keyHistMap = new ConcurrentHashMap<>();
         // default score function
@@ -33,6 +36,7 @@ public class Analyzer {
         sfn = new RegularScoreFunction();
         logfile = filename;
         showZeroScores = s;
+        outPath = outputPath;
     }
     
     public void computeMetrics() throws IOException {        
@@ -80,8 +84,19 @@ public class Analyzer {
         keyHistMap.entrySet().parallelStream().forEach((e) -> {
             keyScoreMap.put(e.getKey(), e.getValue().logScores(sfn, logWriter, showZeroScores));
         });
-        
         logWriter.close();
+        
+        PrintWriter propWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + propFileName, true));
+        int noOfScores = 0;
+        int noOfPosScores = 0;
+        for (String key : keyHistMap.keySet()) {
+            noOfScores += keyHistMap.get(key).getNoOfScores();
+            noOfPosScores += keyHistMap.get(key).getNoOfPosScores();
+        }
+        int noOfZeroScores = noOfScores - noOfPosScores;
+        float prop = (float)noOfPosScores/noOfScores;
+        propWriter.println(noOfScores + "\t" + noOfPosScores + "\t" + noOfZeroScores + "\t" + prop);
+        propWriter.close();
     }
     
     public void processOperation(Operation op) {
