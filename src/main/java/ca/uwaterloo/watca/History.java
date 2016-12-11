@@ -3,7 +3,6 @@ package ca.uwaterloo.watca;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.FileWriter;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +20,7 @@ public class History {
 
     private String key;
     private SortedMap<String, Cluster> clusterMap;
-    private SortedSet<Cluster> clusterSet;
-    
-    private int noOfScores;
-    private int noOfPosScores;
+    private SortedSet<Cluster> clusterSet;   
 
     public History(String key) {
         this.key = key;
@@ -35,24 +31,20 @@ public class History {
 	Operation initWrite = new Operation(key, INITIAL_VALUE, Long.MIN_VALUE, Long.MIN_VALUE, "W");
 	initCluster.addOperation(initWrite);
 	clusterMap.put(INITIAL_VALUE, initCluster);
-	clusterSet.add(initCluster);
-        
-        noOfScores = 0;
-        noOfPosScores = 0;
+	clusterSet.add(initCluster);        
     }
 
     public String getKey() {
         return key;
     }
     
-    public int getNoOfScores() {
-        return noOfScores;
-    }
+    public long getTotalNoOfScores() {
+        return clusterMap.size();
+    }    
     
-    public int getNoOfPosScores() {
-        return noOfPosScores;
+    public long getNoOfPositiveScores(){
+        return clusterSet.stream().filter(c -> c.getScore() > 0).count();
     }
-
     public void addOperation(Operation op) {
         String value = op.getValue();
 	if (value == null && op.isRead())
@@ -107,25 +99,21 @@ public class History {
             SortedSet<Cluster> tail = clusterSet.tailSet(a);
             for (Cluster b : tail) {
                 if (a == b) {
-                    long newScore = Collections.max(sfn.getScores(a, b));
-                    noOfScores++;
+                    long newScore = Collections.max(sfn.getScores(a, b));                    
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
-                        tempScore = Math.max(tempScore, newScore);
-                        noOfPosScores++;
+                        tempScore = Math.max(tempScore, newScore);                       
                     }
                 } else if (a.overlaps(b)) {
-                    long newScore = Collections.max(sfn.getScores(a, b));
-                    noOfScores++;
+                    long newScore = Collections.max(sfn.getScores(a, b));                   
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);
                         if (b.getScore() < newScore) {
                             b.setScore(newScore);
-                        }
-                        noOfPosScores++;
+                        }                        
                     }
                 } else {
                     break;

@@ -28,7 +28,7 @@ public class LinearizabilityTest {
         if (args.length == 3 && args[2].equals("showzeroscores"))
             showZeroScores = true;
         LogParser t = new LogParser();        
-        Analyzer a = new Analyzer(args[1].replaceAll("/+$", "") + scoreFileName, showZeroScores, args[1]);
+        Analyzer a = new Analyzer(args[1], scoreFileName, showZeroScores);
         String sourcePath = args[0];
         File f = new File(sourcePath);
         try

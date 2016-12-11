@@ -24,18 +24,18 @@ public class Analyzer {
     private ConcurrentHashMap<String, History> keyHistMap;
     private ScoreFunction sfn;
     private boolean showZeroScores;
-    private String logfile;
+    private String scoreFileName;
     private String outPath;    
     private static String propFileName = "/proportions.log"; 
     
-    public Analyzer(String filename, boolean s, String outputPath) {
+    public Analyzer(String outputPath, String fileName, boolean showZeroes) {
         operations = new ArrayList();
         keyHistMap = new ConcurrentHashMap<>();
         // default score function
         //sfn = new GKScoreFunction();
         sfn = new RegularScoreFunction();
-        logfile = filename;
-        showZeroScores = s;
+        scoreFileName = fileName;
+        showZeroScores = showZeroes;
         outPath = outputPath;
     }
     
@@ -76,7 +76,7 @@ public class Analyzer {
             }
         }        
         
-        PrintWriter logWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logfile), "utf-8")));       
+        PrintWriter logWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + scoreFileName));       
         
         // compute scores for each history
         ConcurrentMap<String, List<Long>> keyScoreMap = new ConcurrentHashMap();
@@ -90,11 +90,11 @@ public class Analyzer {
         int noOfScores = 0;
         int noOfPosScores = 0;
         for (String key : keyHistMap.keySet()) {
-            noOfScores += keyHistMap.get(key).getNoOfScores();
-            noOfPosScores += keyHistMap.get(key).getNoOfPosScores();
+            noOfScores += keyHistMap.get(key).getTotalNoOfScores();
+            noOfPosScores += keyHistMap.get(key).getNoOfPositiveScores();
         }
         int noOfZeroScores = noOfScores - noOfPosScores;
-        float prop = (float)noOfPosScores/noOfScores;
+        float prop = (float)noOfPosScores / noOfScores;
         propWriter.println(noOfScores + "\t" + noOfPosScores + "\t" + noOfZeroScores + "\t" + prop);
         propWriter.close();
     }
