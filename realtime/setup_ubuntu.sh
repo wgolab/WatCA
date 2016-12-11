@@ -28,7 +28,7 @@ sudo pip install cqlsh
 # install cassandra
 mkdir -p ~/cassandra
 cd  ~/cassandra
-wget http://www.eu.apache.org/dist/cassandra/$CVER/apache-cassandra-$CVER-bin.tar.gz
+wget http://archive.apache.org/dist/cassandra/$CVER/apache-cassandra-$CVER-bin.tar.gz
 tar -xzvf apache-cassandra-$CVER-bin.tar.gz
 sudo mkdir /var/lib/cassandra
 sudo mkdir /var/log/cassandra
