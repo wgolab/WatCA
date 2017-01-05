@@ -24,9 +24,9 @@ public class Analyzer {
     private ConcurrentHashMap<String, History> keyHistMap;
     private ScoreFunction sfn;
     private boolean showZeroScores;
-    private String scoreFileName;
-    private String outPath;    
-    private static String propFileName = "/proportions.log"; 
+    private final String scoreFileName;
+    private final String outPath;    
+    private final static String PROP_FILE_NAME = "/proportions.log"; 
     
     public Analyzer(String outputPath, String fileName, boolean showZeroes) {
         operations = new ArrayList();
@@ -86,7 +86,7 @@ public class Analyzer {
         });
         logWriter.close();
         
-        PrintWriter propWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + propFileName, true));
+        PrintWriter propWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + PROP_FILE_NAME, true));
         int noOfScores = 0;
         int noOfPosScores = 0;
         for (String key : keyHistMap.keySet()) {

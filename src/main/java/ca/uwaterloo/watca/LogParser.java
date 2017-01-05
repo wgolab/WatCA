@@ -54,7 +54,7 @@ public class LogParser {
             isValid = true;
             String[] words = line.split("\\s+");
             int count = 0;
-            if(words.length >= 5)
+            if(words.length >= 5 && words.length < 7)
             {
                 this.time = words[count++];
                 this.eType = EventType.getType(words[count++]);

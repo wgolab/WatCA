@@ -15,8 +15,8 @@ import java.util.List;
  * @author Shankha Subhra Chatterjee, Wojciech Golab
  */
 public class LinearizabilityTest {
-    public static String scoreFileName = "/scores.log";
-    public static String latencyFileName = "/latency.log";
+    public final static String SCORE_FILE_NAME = "/scores.log";
+    public final static String LATENCY_FILE_NAME = "/latency.log";
     
     public static void main(String[] args) throws IOException {       
         boolean showZeroScores = false;
@@ -28,7 +28,7 @@ public class LinearizabilityTest {
         if (args.length == 3 && args[2].equals("showzeroscores"))
             showZeroScores = true;
         LogParser t = new LogParser();        
-        Analyzer a = new Analyzer(args[1], scoreFileName, showZeroScores);
+        Analyzer a = new Analyzer(args[1], SCORE_FILE_NAME, showZeroScores);
         String sourcePath = args[0];
         File f = new File(sourcePath);
         try
@@ -62,7 +62,7 @@ public class LinearizabilityTest {
             int index = (int) (0.95 * (lats.size() - 1));
             long lat95 = lats.get(index);
             
-            PrintWriter latWriter = new PrintWriter(new FileWriter(args[1].replaceAll("/+$", "") + latencyFileName, true));
+            PrintWriter latWriter = new PrintWriter(new FileWriter(args[1].replaceAll("/+$", "") + LATENCY_FILE_NAME, true));
             latWriter.println("AvgLatency\t" + String.valueOf(latAvg));
             latWriter.println("95PercentileLatency\t" + String.valueOf(lat95));
             latWriter.close();          
