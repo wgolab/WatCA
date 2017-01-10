@@ -46,32 +46,37 @@ public class LogParser {
         String value;
         boolean isValid;        
         
-        public OperationLogLine(String line) {            
-            time = "";
-            processID = "";
-            key = "";
-            value = "";
-            isValid = true;
-            String[] words = line.split("\\s+");
-            int count = 0;
-            if(words.length >= 5 && words.length < 7)
-            {
-                this.time = words[count++];
-                this.eType = EventType.getType(words[count++]);
-                this.processID = words[count++];
-                this.oType = OperationType.getType(words[count++]);               
-		this.key = words[count++];
-                
-                if ((this.oType == OperationType.READ && this.eType == EventType.RESPONSE) || 
-                        (this.oType == OperationType.WRITE && this.eType == EventType.INVOKE)) {
-                    if (words.length >= 6)
-                        this.value = words[count++];
-                    else 
-                        this.isValid = false;
-                }                              
-            }
-            else 
+        public OperationLogLine(String line) {
+            try {
+                time = "";
+                processID = "";
+                key = "";
+                value = "";
+                isValid = true;
+                String[] words = line.split("\\s+");
+                int count = 0;
+                if(words.length >= 5 && words.length < 7)
+                {
+                    this.time = words[count++];
+                    this.eType = EventType.getType(words[count++]);
+                    this.processID = words[count++];
+                    this.oType = OperationType.getType(words[count++]);               
+                    this.key = words[count++];
+
+                    if ((this.oType == OperationType.READ && this.eType == EventType.RESPONSE) || 
+                            (this.oType == OperationType.WRITE && this.eType == EventType.INVOKE)) {
+                        if (words.length >= 6)
+                            this.value = words[count++];
+                        else 
+                            this.isValid = false;
+                    }                              
+                }
+                else 
+                    isValid = false;
+            }catch (IllegalArgumentException e) {
                 isValid = false;
+            }
+                
         }     
         
         public boolean isCandidateInvokingLine (OperationLogLine line) {
@@ -79,11 +84,9 @@ public class LogParser {
                    && key.equals(line.key));
         }
     }
-
-    List<OperationLogLine> bufferedLines;
     
     public LogParser() {
-        bufferedLines = new ArrayList();
+        // Do nothing
     }
     
     public List<Operation> parseFiles (File[] files) throws IOException {
@@ -97,6 +100,7 @@ public class LogParser {
     // parameter 'filename' corresponds to the fully qualified filename, including path
     public List<Operation> parseFile(File f) throws IOException {        
         List<Operation> operations = new ArrayList();
+        List<OperationLogLine> bufferedLines = new ArrayList();
         
         try {           
             BufferedReader br = new BufferedReader(new FileReader(f));            
