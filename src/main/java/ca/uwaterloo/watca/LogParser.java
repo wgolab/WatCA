@@ -38,7 +38,7 @@ import java.util.Optional;
 public class LogParser {
     
     class OperationLogLine {       
-        String time;
+        long time;
         EventType eType;
         String processID;
         OperationType oType;
@@ -48,7 +48,6 @@ public class LogParser {
         
         public OperationLogLine(String line) {
             try {
-                time = "";
                 processID = "";
                 key = "";
                 value = "";
@@ -57,7 +56,7 @@ public class LogParser {
                 int count = 0;
                 if(words.length >= 5 && words.length < 7)
                 {
-                    this.time = words[count++];
+                    this.time = Long.parseLong(words[count++]);
                     this.eType = EventType.getType(words[count++]);
                     this.processID = words[count++];
                     this.oType = OperationType.getType(words[count++]);               
@@ -122,13 +121,13 @@ public class LogParser {
                            {
 			       logLine.value = "";
                            }
-                           operations.add(new Operation(invokingLine.get().key, logLine.value, Long.parseLong(invokingLine.get().time), Long.parseLong(logLine.time), "R"));                            
+                           operations.add(new Operation(invokingLine.get().key, logLine.value, invokingLine.get().time, logLine.time, "R"));                            
                        } else if (logLine.oType == OperationType.WRITE) {
                            if (invokingLine.get().value == null)
                            {
 			       // nothing to do
                            }
-                           operations.add(new Operation(invokingLine.get().key, invokingLine.get().value, Long.parseLong(invokingLine.get().time), Long.parseLong(logLine.time), "W"));
+                           operations.add(new Operation(invokingLine.get().key, invokingLine.get().value, invokingLine.get().time, logLine.time, "W"));
                        }
                        bufferedLines.remove(invokingLine.get());
                     }
@@ -138,7 +137,7 @@ public class LogParser {
             // Add write operations for whom response has not been found
             for (OperationLogLine l : bufferedLines) {
                 if (l.oType == OperationType.WRITE && l.eType == EventType.INVOKE) {
-                    operations.add(new Operation(l.key, l.value, Long.parseLong(l.time), Long.MAX_VALUE, "W"));
+                    operations.add(new Operation(l.key, l.value, l.time, Long.MAX_VALUE, "W"));
                 }                 
             }
             return operations;
