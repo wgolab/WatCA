@@ -28,12 +28,10 @@ public class Analyzer {
     private final String outPath;    
     private final static String PROP_FILE_NAME = "/proportions.log"; 
     
-    public Analyzer(String outputPath, String fileName, boolean showZeroes) {
+    public Analyzer(String outputPath, String fileName, boolean showZeroes, ScoreFunction sfn) {
         operations = new ArrayList();
         keyHistMap = new ConcurrentHashMap<>();
-        // default score function
-        //sfn = new GKScoreFunction();
-        sfn = new RegularScoreFunction();
+        this.sfn = sfn;
         scoreFileName = fileName;
         showZeroScores = showZeroes;
         outPath = outputPath;

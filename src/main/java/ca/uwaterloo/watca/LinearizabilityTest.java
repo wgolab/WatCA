@@ -28,7 +28,7 @@ public class LinearizabilityTest {
         if (args.length == 3 && args[2].equals("showzeroscores"))
             showZeroScores = true;
         LogParser t = new LogParser();        
-        Analyzer a = new Analyzer(args[1], SCORE_FILE_NAME, showZeroScores);
+        Analyzer a = new Analyzer(args[1], SCORE_FILE_NAME, showZeroScores, new GKScoreFunction());
         String sourcePath = args[0];
         File f = new File(sourcePath);
         try
