@@ -66,7 +66,9 @@ public class LogParser {
                             (this.oType == OperationType.WRITE && this.eType == EventType.INVOKE)) {
                         if (words.length >= 6)
                             this.value = words[count++];
-                        else 
+                        else if (words.length == 5)
+			    this.value = "";
+			else
                             this.isValid = false;
                     }                              
                 }
@@ -106,9 +108,11 @@ public class LogParser {
             String line;
             while ((line = br.readLine()) != null) {
                 OperationLogLine logLine = new OperationLogLine(line);                
-                if (!logLine.isValid)
+                if (!logLine.isValid) {
+		    System.out.println("Invalid log line! " + line);
                     continue;
-                
+		}
+
                 if (logLine.eType == EventType.INVOKE) {
                     bufferedLines.add(logLine);
                 }else if (logLine.eType == EventType.RESPONSE) {
