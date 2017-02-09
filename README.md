@@ -71,10 +71,10 @@ Compared to WatCA, Knossos deals with a broader range of data types but is prone
 to the exponential state space explosion problem.
 
 Other related systems:
-* [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf), a real-time serializability analyzer for transactions.
-* [Conver](https://github.com/pviotti/conver-scala), a consistency checker.
-* [Horn's linearizability checker](https://github.com/ahorn/linearizability-checker)
-* [Lowe's linearizability checker](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/)
+* [Paper](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf) by Zellag and Kemme (ConsAD, a real-time consistency anomalies detector).
+* [Paper](http://www.eurecom.fr/fr/publication/4874/download/ds-publi-4874.pdf) by Viotti, Meiklejohn and Vukolic', and [Conver](https://github.com/pviotti/conver-scala) system for consistency checking.
+* [Paper](https://arxiv.org/abs/1504.00204) by Horn and Kroening, and [code](https://github.com/ahorn/linearizability-checker).
+* [Paper](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/paper.pdf) by Lowe and [code](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/).
 
 ## Funding Acknowledgment
 Graduate students involved in this project were supported in part by the
