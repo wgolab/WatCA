@@ -73,6 +73,8 @@ to the exponential state space explosion problem.
 Other related systems:
 * [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf), a real-time serializability analyzer for transactions.
 * [Conver](https://github.com/pviotti/conver-scala), a consistency checker.
+* [Horn's linearizability checker](https://github.com/ahorn/linearizability-checker)
+* [Lowe's linearizability checker](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/)
 
 ## Funding Acknowledgment
 Graduate students involved in this project were supported in part by the
