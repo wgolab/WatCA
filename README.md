@@ -65,16 +65,13 @@ interrupted by failures.  Support for the new log format is coming soon.
 - Wojciech Golab - Assistant Professor (https://ece.uwaterloo.ca/~wgolab/)
 
 ## Related Work
-WatCA is most closely related to [Knossos](https://github.com/aphyr/knossos),
-a linearizability analyzer based on model checking techniques.
-Compared to WatCA, Knossos deals with a broader range of data types but is prone
-to the exponential state space explosion problem.
-
-Other related systems:
-* [Paper](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf) by Zellag and Kemme (ConsAD, a real-time consistency anomalies detector).
-* [Paper](http://www.eurecom.fr/fr/publication/4874/download/ds-publi-4874.pdf) by Viotti, Meiklejohn and Vukolic', and [Conver](https://github.com/pviotti/conver-scala) system for consistency checking.
-* [Paper](https://arxiv.org/abs/1504.00204) by Horn and Kroening, and [code](https://github.com/ahorn/linearizability-checker).
-* [Paper](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/paper.pdf) by Lowe and [code](http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/).
+System | Paper | Authors | Description
+--- | --- | --- | ---
+[Knossos](https://github.com/aphyr/knossos) | | Kyle Kingsbury | a linearizability analyzer based on model checking techniques
+ConsAD | (http://www.cs.mcgill.ca/~kzella/ConsAD.pdf) | Zellag and Kemme | a real-time consistency anomalies detector
+[Conver](https://github.com/pviotti/conver-scala) | (http://www.eurecom.fr/fr/publication/4874/download/ds-publi-4874.pdf) | Viotti, Meiklejohn and Vukolic | a system for consistency checking
+(https://github.com/ahorn/linearizability-checker) | (https://arxiv.org/abs/1504.00204) | Horn and Kroening | linearizability checker
+(http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/) | (http://www.cs.ox.ac.uk/people/gavin.lowe/LinearizabiltyTesting/paper.pdf) | Lowe | linearizability checker
 
 ## Funding Acknowledgment
 Graduate students involved in this project were supported in part by the
