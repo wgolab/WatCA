@@ -70,8 +70,9 @@ a linearizability analyzer based on model checking techniques.
 Compared to WatCA, Knossos deals with a broader range of data types but is prone
 to the exponential state space explosion problem.
 
-Another related system is [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf),
-a real-time serializability analyzer for transactions.
+Other related systems:
+* [ConsAD](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf), a real-time serializability analyzer for transactions.
+* [Conver](https://github.com/pviotti/conver-scala), a consistency checker.
 
 ## Funding Acknowledgment
 Graduate students involved in this project were supported in part by the
