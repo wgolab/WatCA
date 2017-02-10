@@ -17,24 +17,22 @@ import com.sun.net.httpserver.Headers;
 import java.net.URL;
 
 public class RealtimeMain {
-
     private RealtimeAnalyzer ana;
     int portYCSB;
     String hostYCSB;
     static boolean javaControl;
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 5 && args[4].equals("javaControl")) {
-            javaControl = true;
-        } else {
-            javaControl = false;
-        }
-        RealtimeMain m = new RealtimeMain();
+	javaControl = (args.length >= 5 && args[4].equals("javaControl")) ||
+	    (args.length >= 6 && args[5].equals("javaControl"));
+	boolean saveLogs = (args.length >= 5 && args[4].equals("saveLogs")) ||
+	    (args.length >= 6 && args[5].equals("saveLogs"));
+        RealtimeMain m = new RealtimeMain(saveLogs);
         m.listen(Integer.parseInt(args[0]), Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
     }
 
-    public RealtimeMain() {
-        ana = new RealtimeAnalyzer();
+    public RealtimeMain(boolean saveLogs) {
+        ana = new RealtimeAnalyzer(saveLogs);
     }
 
     public void listen(int port1, int port2, String host3, int port3) throws IOException {
