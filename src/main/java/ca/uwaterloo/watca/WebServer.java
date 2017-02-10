@@ -214,7 +214,7 @@ class WebServer {
             else
                 ret += "<option value=\"zipfian\">zipfian</option>";
             if (prop.getProperty("dist").equals("hotspot"))
-                ret += "<option value=\"hotspot\" selected>zipfian</option>";
+                ret += "<option value=\"hotspot\" selected>hotspot</option>";
             else
                 ret += "<option value=\"hotspot\">hotspot</option>";
             ret += "</select> </p>";
