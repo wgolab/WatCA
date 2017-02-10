@@ -71,6 +71,10 @@ fun_kill_DB() {
     done
 }
 
+fun_kill_java() {
+    killall java
+}
+
 fun_start_DB() {
 
     # delete old data
@@ -188,6 +192,10 @@ case $1 in
     kill)
         fun_kill_DB
         echo "====kill cassandra done!.===="
+        ;;
+    kill_java)
+        fun_kill_java
+        echo "====kill Java done!.===="
         ;;
     start)
         fun_start_DB

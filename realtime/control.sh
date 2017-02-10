@@ -83,6 +83,15 @@ kill_db() {
     echo "NoSQL DB servers stopped."
 }
 
+kill_java() {
+    shellPath=$WatcaPath/realtime
+    cmd="cd ${shellPath} && bash control_stub.sh kill_java"
+    echo $cmd
+
+    run_on_servers "${cmd}" "KillJava" 1
+    echo "Java stopped."
+}
+
 start_DB() {
     echo "Begin to start NoSQL DB servers"
     shellPath=$WatcaPath/realtime
@@ -177,6 +186,9 @@ case $1 in
         ;;
     kill_db)
         kill_db
+        ;;
+    kill_java)
+        kill_java
         ;;
     load_ycsb)
         load_YCSB
