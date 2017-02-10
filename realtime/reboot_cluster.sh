@@ -8,5 +8,5 @@ for S in `cat servers_public`
 do
     echo Rebooting server $S
     scp reboot_server.sh $USR@$S:
-    ssh $USR@$S "./reboot.sh"
+    ssh $USR@$S "./reboot_server.sh"
 done
