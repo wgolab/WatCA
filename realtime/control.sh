@@ -119,6 +119,11 @@ load_YCSB() {
     do
 	nextStart=`printf "%.*f\n" 0 $start`
 	nextCount=`printf "%.*f\n" 0 $countPerHost`
+	if [ ${keyspace} -lt ${serverNum} ]
+	then
+	    nextStart=0
+	    nextCount=${keyspace}
+	fi
 	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
         sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
