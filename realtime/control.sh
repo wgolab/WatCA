@@ -159,7 +159,7 @@ work_YCSB() {
     for public_ip in `cat servers_public`
     do
 	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
-        sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
+	sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
             -e s/REQUESTDISTRIBUTION_Placeholder/${dist}/ \

@@ -69,6 +69,7 @@ fun_kill_DB() {
     do
         kill $pid
     done
+    killall java
 }
 
 fun_kill_java() {
