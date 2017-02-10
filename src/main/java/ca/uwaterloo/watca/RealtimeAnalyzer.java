@@ -251,8 +251,9 @@ public class RealtimeAnalyzer {
         }
 
         System.out.println("Metric computation at time " + now + " processed " + numOps + " ops in " +
-			   (System.currentTimeMillis() - now) + " ms, operation throughput is " + thru + " kops/s");
-        System.out.println("Metric value (inconsistency) is " + staleProp);
+			   (System.currentTimeMillis() - now) + " ms, " +
+			   "operation throughput is " + thru + " kops/s, " +
+			   "metric value (inconsistency) is " + staleProp);
     }
 
     public String getOutputStaleProp() {
