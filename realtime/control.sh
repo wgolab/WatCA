@@ -111,23 +111,24 @@ load_YCSB() {
 
     echo "Generate partition workload files"
     serverNum=`cat servers_public | wc -l`
-    countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
+    countPerHost=`echo "scale = 10; ${keyspace} / ${serverNum}" | bc`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
-
     start=0
 
     for public_ip in `cat servers_public`
     do
+	nextStart=`printf "%.*f\n" 0 $start`
+	nextCount=`printf "%.*f\n" 0 $countPerHost`
 	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
         sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
             -e s/REQUESTDISTRIBUTION_Placeholder/${dist}/ \
             -e s/HOTSPOTDATAFRACTION_Placeholder/${hotspotdatafraction}/ \
-            -e s/INSERTSTART_Placeholder/${start}/ \
-            -e s/INSERTCOUNT_Placeholder/${countPerHost}/ \
+            -e s/INSERTSTART_Placeholder/${nextStart}/ \
+            -e s/INSERTCOUNT_Placeholder/${nextCount}/ \
             my_workload.template > gen_file/workload".${host}"
-        start=`expr $start + $countPerHost`
+        start=`echo "scale = 10; $start + $countPerHost" | bc`
     done
 
     echo "Sync files to servers"
