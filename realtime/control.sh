@@ -100,7 +100,7 @@ start_DB() {
 
 load_YCSB() {
 
-    echo "Generate partion workload files"
+    echo "Generate partition workload files"
     serverNum=`cat servers_public | wc -l`
     countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
@@ -135,12 +135,11 @@ load_YCSB() {
 }
 
 work_YCSB() {
-    echo "Generate partion workload files"
+    echo "Generate partition workload files"
     serverNum=`cat servers_public | wc -l`
-    countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
+    # using entire key space at each server for work phase
+    keySpaceSize=`echo ${keyspace}`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
-
-    start=0
 
     for public_ip in `cat servers_public`
     do
@@ -150,10 +149,9 @@ work_YCSB() {
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
             -e s/REQUESTDISTRIBUTION_Placeholder/${dist}/ \
             -e s/HOTSPOTDATAFRACTION_Placeholder/${hotspotdatafraction}/ \
-            -e s/INSERTSTART_Placeholder/${start}/ \
-            -e s/INSERTCOUNT_Placeholder/${countPerHost}/ \
+            -e s/INSERTSTART_Placeholder/0/ \
+            -e s/INSERTCOUNT_Placeholder/${keySpaceSize}/ \
             my_workload.template > gen_file/workload".${host}"
-        start=`expr $start + $countPerHost`
     done
 
     echo "Sync files to servers"
