@@ -28,11 +28,11 @@ public class RealtimeAnalyzer {
     private final SortedMap<Long, Float> outputStalePropCopy;
     private final SortedMap<Long, List<Long>> outputStaleQuart;
     private final SortedMap<Long, Float> outputThroughput;
-	private final SortedMap<Long, Float> outputThroughputCopy;
+    private final SortedMap<Long, Float> outputThroughputCopy;
     private final SortedMap<Long, Float> outputLatencyAvg;
     private final SortedMap<Long, Float> outputLatencyAvgCopy;
     private final SortedMap<Long, Float> outputLatency95;
-	private final SortedMap<Long, Float> outputLatency95Copy;
+    private final SortedMap<Long, Float> outputLatency95Copy;
     private final List<Long> outputSpectrum;
 
     private AtomicInteger numLines;
@@ -50,12 +50,12 @@ public class RealtimeAnalyzer {
         outputStalePropCopy = new TreeMap();
         outputStaleQuart = new TreeMap();
         outputThroughput = new TreeMap();
-		outputThroughputCopy = new TreeMap();
+        outputThroughputCopy = new TreeMap();
         outputLatencyAvg = new TreeMap();
         outputLatencyAvgCopy = new TreeMap();
         outputLatency95 = new TreeMap();
-		outputLatency95Copy = new TreeMap();
-	outputSpectrum = new ArrayList();
+        outputLatency95Copy = new TreeMap();
+        outputSpectrum = new ArrayList();
         keyHistMap = new ConcurrentHashMap<>();
         // default score function
         sfn = new RegularScoreFunction();
@@ -139,10 +139,10 @@ public class RealtimeAnalyzer {
             scoreList.addAll(scores);
         });
 
-	synchronized (outputSpectrum) {
-	    outputSpectrum.clear();
-	    outputSpectrum.addAll(scoreList);
-	}
+        synchronized (outputSpectrum) {
+            outputSpectrum.clear();
+            outputSpectrum.addAll(scoreList);
+        }
 
         // Compute staleness  proportion.
         int numScores = scoreList.size();
@@ -232,37 +232,36 @@ public class RealtimeAnalyzer {
         ret += "\"cols\": [\n";
         ret += "{\"id\":\"time\",\"label\":\"Time\",\"type\":\"number\"},\n";
         ret += "{\"id\":\"staleprop\",\"label\":\"Stale proportion\",\"type\":\"number\"},\n";
-		ret += "{\"id\":\"snapshot\",\"label\":\"\",\"type\":\"number\"}\n";
+        ret += "{\"id\":\"snapshot\",\"label\":\"\",\"type\":\"number\"}\n";
         ret += "],\n";
         ret += "\"rows\": [\n";
 
-		boolean needComma = false;
-		// first display data saved in snapshot		
-		synchronized (outputStalePropCopy) {			
-			Long maxTime = 0L;			
-			if (!outputStalePropCopy.isEmpty())
-			{
-				maxTime = outputStalePropCopy.lastKey();
-			}
-
-			ArrayList<Long> keys = new ArrayList<Long> (outputStalePropCopy.keySet());
-			Collections.reverse(keys);
-            for (Long time : keys) {               
-                Float staleness = outputStalePropCopy.get(time);					
-				if (needComma) {
-					ret += ",";
-				} else {
-					needComma = true;
-				}		
-				
-				ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + staleness + "}]}\n";			                             
+        boolean needComma = false;
+        // first display data saved in snapshot		
+        synchronized (outputStalePropCopy) {
+            Long maxTime = 0L;
+            if (!outputStalePropCopy.isEmpty()) {
+                maxTime = outputStalePropCopy.lastKey();
             }
-		}	
-		
-		// now display new data
+
+            ArrayList<Long> keys = new ArrayList<Long>(outputStalePropCopy.keySet());
+            Collections.reverse(keys);
+            for (Long time : keys) {
+                Float staleness = outputStalePropCopy.get(time);
+                if (needComma) {
+                    ret += ",";
+                } else {
+                    needComma = true;
+                }
+
+                ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + staleness + "}]}\n";
+            }
+        }
+
+        // now display new data
         synchronized (outputStaleProp) {
             List<Long> toRemove = new ArrayList();
-            Long maxTime = outputStaleProp.lastKey();            
+            Long maxTime = outputStaleProp.lastKey();
             for (Long time : outputStaleProp.keySet()) {
                 if (now - time <= DISPLAY_WINDOW_SIZE) {
                     Float staleness = outputStaleProp.get(time);
@@ -294,61 +293,60 @@ public class RealtimeAnalyzer {
         ret += "\"cols\": [\n";
         ret += "{\"id\":\"time\",\"label\":\"Time\",\"type\":\"number\"},\n";
         ret += "{\"id\":\"throughput\",\"label\":\"Throughput\",\"type\":\"number\"},\n";
-		ret += "{\"id\":\"snapshot\",\"label\":\"\",\"type\":\"number\"}\n";
-		//ret += "{\"id\":\"style\",\"label\":\"\",\"type\":\"string\",\"p\":{\"role\":\"style\"}}\n";
+        ret += "{\"id\":\"snapshot\",\"label\":\"\",\"type\":\"number\"}\n";
+        //ret += "{\"id\":\"style\",\"label\":\"\",\"type\":\"string\",\"p\":{\"role\":\"style\"}}\n";
         ret += "],\n";
         ret += "\"rows\": [\n";
-		
-		TreeMap<Long, ArrayList<Float>> timeAndThroughputList = new TreeMap();
-		
-		boolean needComma = false;
-		// first display data saved in snapshot		
-		synchronized (outputThroughputCopy) {			
-			Long maxTime = 0L;			
-			if (!outputThroughputCopy.isEmpty())
-			{
-				maxTime = outputThroughputCopy.lastKey();
-			}
 
-			ArrayList<Long> keys = new ArrayList<Long> (outputThroughputCopy.keySet());
-			Collections.reverse(keys);
-            for (Long time : keys) {               
-                Float thru = outputThroughputCopy.get(time);					
-				if (needComma) {
-					ret += ",";
-				} else {
-					needComma = true;
-				}		
-				
-				ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + thru + "}]}\n";			                             
+        TreeMap<Long, ArrayList<Float>> timeAndThroughputList = new TreeMap();
+
+        boolean needComma = false;
+        // first display data saved in snapshot		
+        synchronized (outputThroughputCopy) {
+            Long maxTime = 0L;
+            if (!outputThroughputCopy.isEmpty()) {
+                maxTime = outputThroughputCopy.lastKey();
             }
-		}	
-		
-		// now display new data
+
+            ArrayList<Long> keys = new ArrayList<Long>(outputThroughputCopy.keySet());
+            Collections.reverse(keys);
+            for (Long time : keys) {
+                Float thru = outputThroughputCopy.get(time);
+                if (needComma) {
+                    ret += ",";
+                } else {
+                    needComma = true;
+                }
+
+                ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + thru + "}]}\n";
+            }
+        }
+
+        // now display new data
         synchronized (outputThroughput) {
             List<Long> toRemove = new ArrayList();
-            Long maxTime = outputThroughput.lastKey();			
-			
-			for (Long time : outputThroughput.keySet()) {					
-				if (now - time <= DISPLAY_WINDOW_SIZE) {
-					Float thru = outputThroughput.get(time);					
-					if (needComma) {
-						ret += ",";
-					} else {
-						needComma = true;
-					}
-					
-					Long timeToPlot = time - maxTime;
-					ArrayList<Float> values;									
-					ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + thru + "},{\"v\":" + "null" + "}]}\n";
-				} else {						
-					toRemove.add(time);
-				}
-			}			
-			for (Long time : toRemove) {
-				outputThroughput.remove(time);
-			}		
-		}           
+            Long maxTime = outputThroughput.lastKey();
+
+            for (Long time : outputThroughput.keySet()) {
+                if (now - time <= DISPLAY_WINDOW_SIZE) {
+                    Float thru = outputThroughput.get(time);
+                    if (needComma) {
+                        ret += ",";
+                    } else {
+                        needComma = true;
+                    }
+
+                    Long timeToPlot = time - maxTime;
+                    ArrayList<Float> values;
+                    ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + thru + "},{\"v\":" + "null" + "}]}\n";
+                } else {
+                    toRemove.add(time);
+                }
+            }
+            for (Long time : toRemove) {
+                outputThroughput.remove(time);
+            }
+        }
 
         ret += "]\n";
         ret += "}\n";
@@ -362,45 +360,44 @@ public class RealtimeAnalyzer {
         String ret = "{\n";
         ret += "\"cols\": [\n";
         ret += "{\"id\":\"time\",\"label\":\"Time\",\"type\":\"number\"},\n";
-        ret += "{\"id\":\"latencyavg\",\"label\":\"Average latency\",\"type\":\"number\"},\n";		
-        ret += "{\"id\":\"latency95\",\"label\":\"95% latency\",\"type\":\"number\"},\n";		
-		ret += "{\"id\":\"snapshotavg\",\"label\":\"Snapshot of average latency\",\"type\":\"number\"},\n";
-		ret += "{\"id\":\"snapshot95\",\"label\":\"Snapshot of 95% latency\",\"type\":\"number\"}\n";
+        ret += "{\"id\":\"latencyavg\",\"label\":\"Average latency\",\"type\":\"number\"},\n";
+        ret += "{\"id\":\"latency95\",\"label\":\"95% latency\",\"type\":\"number\"},\n";
+        ret += "{\"id\":\"snapshotavg\",\"label\":\"Snapshot of average latency\",\"type\":\"number\"},\n";
+        ret += "{\"id\":\"snapshot95\",\"label\":\"Snapshot of 95% latency\",\"type\":\"number\"}\n";
         ret += "],\n";
         ret += "\"rows\": [\n";
-		
-		boolean needComma = false;
-		
-		// keys are reversed to prevent extra lines in the plots
-		ArrayList<Long> keys = new ArrayList<Long> (outputLatencyAvgCopy.keySet());
-		Collections.reverse(keys);
-		
-		// first display data saved in snapshot
-		synchronized (outputLatencyAvgCopy) {
+
+        boolean needComma = false;
+
+        // keys are reversed to prevent extra lines in the plots
+        ArrayList<Long> keys = new ArrayList<Long>(outputLatencyAvgCopy.keySet());
+        Collections.reverse(keys);
+
+        // first display data saved in snapshot
+        synchronized (outputLatencyAvgCopy) {
             synchronized (outputLatency95Copy) {
-				Long maxTime = 0L;			
-				if (!outputLatencyAvgCopy.isEmpty())
-				{
-					maxTime = outputLatencyAvgCopy.lastKey();
-				}
+                Long maxTime = 0L;
+                if (!outputLatencyAvgCopy.isEmpty()) {
+                    maxTime = outputLatencyAvgCopy.lastKey();
+                }
                 for (Long time : keys) {
-					Float latAvg = outputLatencyAvgCopy.get(time);
-					Float lat95 = outputLatency95Copy.get(time);
-					if (needComma) {
-						ret += ",";
-					} else {
-						needComma = true;
-					}
-					ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + "null" + "},{\"v\":" + latAvg + "},{\"v\":" + lat95 + "}]}\n";
-					
-				}
-			}
-		}	
-		// now display new data
+                    Float latAvg = outputLatencyAvgCopy.get(time);
+                    Float lat95 = outputLatency95Copy.get(time);
+                    if (needComma) {
+                        ret += ",";
+                    } else {
+                        needComma = true;
+                    }
+                    ret += "{\"c\":[{\"v\":" + (float) (time - maxTime) / 1000 + "},{\"v\":" + "null" + "},{\"v\":" + "null" + "},{\"v\":" + latAvg + "},{\"v\":" + lat95 + "}]}\n";
+
+                }
+            }
+        }
+        // now display new data
         synchronized (outputLatencyAvg) {
             synchronized (outputLatency95) {
                 List<Long> toRemove = new ArrayList();
-                Long maxTime = outputLatencyAvg.lastKey();                
+                Long maxTime = outputLatencyAvg.lastKey();
                 for (Long time : outputLatencyAvg.keySet()) {
                     if (now - time <= DISPLAY_WINDOW_SIZE) {
                         Float latAvg = outputLatencyAvg.get(time);
@@ -485,23 +482,23 @@ public class RealtimeAnalyzer {
         ret += "],\n";
         ret += "\"rows\": [\n";
 
-	boolean needComma = false;
-	// first display data saved in snapshot
+        boolean needComma = false;
+        // first display data saved in snapshot
         synchronized (outputLatencyAvgCopy) {
             synchronized (outputStalePropCopy) {
                 for (Long time : outputLatencyAvgCopy.keySet()) {
-		    Float latAvg = outputLatencyAvgCopy.get(time);
-		    Float staleProp = outputStalePropCopy.get(time);
-		    if (needComma) {
-			ret += ",";
-		    } else {
-			needComma = true;
-		    }
-		    ret += "{\"c\":[{\"v\":" + latAvg + "},{\"v\":" + staleProp + "},{\"v\":\"gray\"}]}\n";
-		}
-	    }
+                    Float latAvg = outputLatencyAvgCopy.get(time);
+                    Float staleProp = outputStalePropCopy.get(time);
+                    if (needComma) {
+                        ret += ",";
+                    } else {
+                        needComma = true;
+                    }
+                    ret += "{\"c\":[{\"v\":" + latAvg + "},{\"v\":" + staleProp + "},{\"v\":\"gray\"}]}\n";
+                }
+            }
         }
-	// now display new data
+        // now display new data
         synchronized (outputLatencyAvg) {
             synchronized (outputStaleProp) {
                 List<Long> toRemove = new ArrayList();
@@ -527,7 +524,6 @@ public class RealtimeAnalyzer {
             }
         }
 
-
         ret += "]\n";
         ret += "}\n";
 
@@ -544,43 +540,43 @@ public class RealtimeAnalyzer {
         ret += "],\n";
         ret += "\"rows\": [\n";
 
-	long scale = 1;
-	Map<Integer, Integer> map = new HashMap<>();
-	int numZeros = 0;
-	long maxVal = 9;
-	int numBars = 10;
+        long scale = 1;
+        Map<Integer, Integer> map = new HashMap<>();
+        int numZeros = 0;
+        long maxVal = 9;
+        int numBars = 10;
 
         synchronized (outputSpectrum) {
-	    for (Long score : outputSpectrum) {
-		maxVal = Math.max(maxVal, score);
-	    }
-	    float f = (float)(Math.log(maxVal) / Math.log(10));
-	    int i = (int)f;
-	    maxVal = (int)Math.pow(10, i+1);
-	    scale = Math.max(1, maxVal / numBars);
+            for (Long score : outputSpectrum) {
+                maxVal = Math.max(maxVal, score);
+            }
+            float f = (float) (Math.log(maxVal) / Math.log(10));
+            int i = (int) f;
+            maxVal = (int) Math.pow(10, i + 1);
+            scale = Math.max(1, maxVal / numBars);
 
             for (Long score : outputSpectrum) {
-		if (score == 0) {
-		    numZeros++;
-		} else {
-		    i = (int)(score/scale);
-		    if (map.containsKey(i)) {
-			map.put(i, map.get(i) + 1);
-		    } else {
-			map.put(i, 1);
-		    }
-		}
-	    }
-	}
+                if (score == 0) {
+                    numZeros++;
+                } else {
+                    i = (int) (score / scale);
+                    if (map.containsKey(i)) {
+                        map.put(i, map.get(i) + 1);
+                    } else {
+                        map.put(i, 1);
+                    }
+                }
+            }
+        }
 
-	ret += "{\"c\":[{\"v\":\"0\"},{\"v\":" + numZeros + "}]}\n";
-	for (int i = 0; i < numBars; i++) {
-	    ret += ",";
-	    int j = 0;
-	    if (map.containsKey(i)) {
-		j = map.get(i);
-	    }
-	    ret += "{\"c\":[{\"v\":\"(" + (i * scale) + ", " + ((i + 1) * scale) + "]\"},{\"v\":" + j + "}]}\n";
+        ret += "{\"c\":[{\"v\":\"0\"},{\"v\":" + numZeros + "}]}\n";
+        for (int i = 0; i < numBars; i++) {
+            ret += ",";
+            int j = 0;
+            if (map.containsKey(i)) {
+                j = map.get(i);
+            }
+            ret += "{\"c\":[{\"v\":\"(" + (i * scale) + ", " + ((i + 1) * scale) + "]\"},{\"v\":" + j + "}]}\n";
         }
 
         ret += "]\n";
@@ -590,62 +586,62 @@ public class RealtimeAnalyzer {
     }
 
     public void snapshot() {
-	synchronized (outputStalePropCopy) {
-	    outputStalePropCopy.clear();
-	    synchronized (outputStaleProp) {
-		outputStalePropCopy.putAll(outputStaleProp);
-	    }
-	}
-	synchronized (outputLatencyAvgCopy) {
-	    outputLatencyAvgCopy.clear();
-	    synchronized (outputLatencyAvg) {
-		outputLatencyAvgCopy.putAll(outputLatencyAvg);
-	    }
-	}	
-	synchronized (outputThroughputCopy) {
-	    outputThroughputCopy.clear();
-	    synchronized (outputThroughput) {
-			outputThroughputCopy.putAll(outputThroughput);
-	    }
-	}
-	synchronized (outputLatency95Copy) {
-	    outputLatency95Copy.clear();
-	    synchronized (outputLatency95) {
-			outputLatency95Copy.putAll(outputLatency95);
-	    }
-	}	
-    }	
+        synchronized (outputStalePropCopy) {
+            outputStalePropCopy.clear();
+            synchronized (outputStaleProp) {
+                outputStalePropCopy.putAll(outputStaleProp);
+            }
+        }
+        synchronized (outputLatencyAvgCopy) {
+            outputLatencyAvgCopy.clear();
+            synchronized (outputLatencyAvg) {
+                outputLatencyAvgCopy.putAll(outputLatencyAvg);
+            }
+        }
+        synchronized (outputThroughputCopy) {
+            outputThroughputCopy.clear();
+            synchronized (outputThroughput) {
+                outputThroughputCopy.putAll(outputThroughput);
+            }
+        }
+        synchronized (outputLatency95Copy) {
+            outputLatency95Copy.clear();
+            synchronized (outputLatency95) {
+                outputLatency95Copy.putAll(outputLatency95);
+            }
+        }
+    }
 
     public void clearData() {
-	synchronized (outputStaleProp) {
-	    outputStaleProp.clear();
-	}
-	synchronized (outputStaleQuart) {
-	    outputStaleQuart.clear();
-	}
-	synchronized (outputThroughput) {
-	    outputThroughput.clear();
-	}
-	synchronized (outputLatencyAvg) {
-	    outputLatencyAvg.clear();
-	}
-	synchronized (outputLatency95) {
-	    outputLatency95.clear();
-	}
-	synchronized (outputSpectrum) {
-	    outputSpectrum.clear();
-	}	
-	synchronized (outputStalePropCopy) {
-	    outputStalePropCopy.clear();
-	}
-	synchronized (outputLatencyAvgCopy) {
-	    outputLatencyAvgCopy.clear();
-	}
-	synchronized (outputThroughputCopy) {
-	    outputThroughputCopy.clear();
-	}
-	synchronized (outputLatency95Copy) {
-	    outputLatency95Copy.clear();
-	}	
+        synchronized (outputStaleProp) {
+            outputStaleProp.clear();
+        }
+        synchronized (outputStaleQuart) {
+            outputStaleQuart.clear();
+        }
+        synchronized (outputThroughput) {
+            outputThroughput.clear();
+        }
+        synchronized (outputLatencyAvg) {
+            outputLatencyAvg.clear();
+        }
+        synchronized (outputLatency95) {
+            outputLatency95.clear();
+        }
+        synchronized (outputSpectrum) {
+            outputSpectrum.clear();
+        }
+        synchronized (outputStalePropCopy) {
+            outputStalePropCopy.clear();
+        }
+        synchronized (outputLatencyAvgCopy) {
+            outputLatencyAvgCopy.clear();
+        }
+        synchronized (outputThroughputCopy) {
+            outputThroughputCopy.clear();
+        }
+        synchronized (outputLatency95Copy) {
+            outputLatency95Copy.clear();
+        }
     }
 }

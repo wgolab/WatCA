@@ -34,7 +34,7 @@ public class RegularScoreFunction implements ScoreFunction {
                 return 0;
             } else {
                 // yes conflict
-                return Math.min(aMaxReadStart - bWriteFinish, bMaxReadStart - aWriteFinish);
+                return Math.min(aMaxReadStart - bWriteFinish, bMaxReadStart - aWriteFinish)/2;
             }
         } else if (aIsForward && !bIsForward) {
             // one forward zone
@@ -43,7 +43,7 @@ public class RegularScoreFunction implements ScoreFunction {
                 return 0;
             } else {
                 // yes conflict
-                return Math.min(aMaxReadStart - bWriteFinish, bWriteStart - aWriteFinish);
+                return Math.min((aMaxReadStart - bWriteFinish)/2, bWriteStart - aWriteFinish);
             }
         } else if (!aIsForward && bIsForward) {
             // one forward zone
@@ -52,7 +52,7 @@ public class RegularScoreFunction implements ScoreFunction {
                 return 0;
             } else {
                 // yes conflict
-                return Math.min(bMaxReadStart - aWriteFinish, aWriteStart - bWriteFinish);
+                return Math.min((bMaxReadStart - aWriteFinish)/2, aWriteStart - bWriteFinish);
             }
         } else {
             // two backward zones, no conflict

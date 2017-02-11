@@ -27,6 +27,7 @@ public class YCSBConnectorWrapper extends DB {
     static private final Lock lock = new ReentrantLock();
     static private BufferedWriter streamWriter;
     static private BufferedWriter fileWriter;
+    static private BufferedWriter fileWriter2;
     static private int numThreads = 0;
     private DB innerDB;
     static private long readDelay;
@@ -83,6 +84,9 @@ public class YCSBConnectorWrapper extends DB {
                 System.out.println("Opening log file: " + logFileName);
                 fileWriter = new BufferedWriter(new FileWriter(logFileName, true));
                 System.out.println("Opened log file: " + logFileName);
+                
+                // Need another log file to record operation times without ADs
+                fileWriter2 = new BufferedWriter(new FileWriter("/tmp/log_without_ad.log"));                
 
                 System.out.println("Opening log stream: " + logHost + ":" + logPort);
                 Socket socket = new Socket(logHost, Integer.parseInt(logPort));
@@ -134,16 +138,14 @@ public class YCSBConnectorWrapper extends DB {
 
     @Override
     public Status read(String table, String key, Set<String> fields, HashMap<String, ByteIterator> result) {
-        long start, finish;
-        start = System.currentTimeMillis();
-        logEventToFile(start, "INV", Thread.currentThread().getId(), "R", key, "");
+        long start, startNoDel,  finish;        
+        start = System.currentTimeMillis();               
         try {
             Thread.sleep(readDelay);
         } catch (InterruptedException ex) {
         }
-	long now = System.currentTimeMillis();
+        startNoDel = System.currentTimeMillis();        	
         Status ret = Status.OK;
-
 	ret = innerDB.read(table, key, fields, result);
 	finish = System.currentTimeMillis();
 	String value = "";
@@ -157,8 +159,11 @@ public class YCSBConnectorWrapper extends DB {
 		b = result.get(result.keySet().iterator().next());
 	    }
 	    value = new String(b.toArray());
-	}	
-        logEventToFile(finish, "RES", Thread.currentThread().getId(), "R", key, value);
+	}
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "R", key, "", fileWriter);
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "R", key, value, fileWriter);
+        logEventToFile(startNoDel, "INV", Thread.currentThread().getId(), "R", key, "", fileWriter2);
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "R", key, value, fileWriter2);
         logOperation("R", key, value, start, finish);
 	
         return ret;
@@ -171,36 +176,42 @@ public class YCSBConnectorWrapper extends DB {
 
     @Override
     public Status update(String table, String key, HashMap<String, ByteIterator> values) {
-        long start, finish;
+        long start, finishNoDel, finish;
         start = System.currentTimeMillis();        
         HashMap<String, String> values2 = StringByteIterator.getStringMap(values);
-        String value = values2.get(values2.keySet().iterator().next());        
-        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value);
+        String value = values2.get(values2.keySet().iterator().next());       
         Status ret = innerDB.update(table, key, StringByteIterator.getByteIteratorMap(values2));
+        finishNoDel = System.currentTimeMillis();
         try {
             Thread.sleep(writeDelay);
         } catch (InterruptedException ex) {
         }
-        finish = System.currentTimeMillis();        
-        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "");
+        finish = System.currentTimeMillis();
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value, fileWriter);
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "", fileWriter);
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value, fileWriter2);
+        logEventToFile(finishNoDel, "RES", Thread.currentThread().getId(), "W", key, "", fileWriter2);
         logOperation("U", key, value, start, finish);
         return ret;
     }
 
     @Override
     public Status insert(String table, String key, HashMap<String, ByteIterator> values) {
-        long start, finish;
+        long start, finishNoDel, finish;
         start = System.currentTimeMillis();
         HashMap<String, String> values2 = StringByteIterator.getStringMap(values);
-        String value = values2.get(values2.keySet().iterator().next());
-        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value);
+        String value = values2.get(values2.keySet().iterator().next());        
         Status ret = innerDB.insert(table, key, StringByteIterator.getByteIteratorMap(values2));
+        finishNoDel = System.currentTimeMillis();
         try {
             Thread.sleep(writeDelay);
         } catch (InterruptedException ex) {
         }
         finish = System.currentTimeMillis();
-        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "");
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value, fileWriter);
+        logEventToFile(finish, "RES", Thread.currentThread().getId(), "W", key, "", fileWriter);
+        logEventToFile(start, "INV", Thread.currentThread().getId(), "W", key, value, fileWriter2);
+        logEventToFile(finishNoDel, "RES", Thread.currentThread().getId(), "W", key, "", fileWriter2);
         logOperation("I", key, value, start, finish);
         return ret;
     }
@@ -240,25 +251,26 @@ public class YCSBConnectorWrapper extends DB {
         }
     }
     
-    private void logEventToFile(long time, String eventType, long processId, String operationType, String key, String value){
+    private void logEventToFile(long time, String eventType, long processId, 
+            String operationType, String key, String value, BufferedWriter bfileWriter){
         try {
             lock.lock();
-            if (fileWriter != null){
-                fileWriter .write(String.valueOf(time));
-                fileWriter.write("\t");
-                fileWriter .write(String.valueOf(eventType));
-                fileWriter.write("\t");
-                fileWriter.write(String.valueOf(processId));
-                fileWriter.write("\t");
-                fileWriter.write(operationType);
-                fileWriter.write("\t");
-                fileWriter.write(key);
-                fileWriter.write("\t");
+            if (bfileWriter != null){
+                bfileWriter .write(String.valueOf(time));
+                bfileWriter.write("\t");
+                bfileWriter .write(String.valueOf(eventType));
+                bfileWriter.write("\t");
+                bfileWriter.write(String.valueOf(processId));
+                bfileWriter.write("\t");
+                bfileWriter.write(operationType);
+                bfileWriter.write("\t");
+                bfileWriter.write(key);
+                bfileWriter.write("\t");
                 if (!value.isEmpty()){
-                    fileWriter.write(sha1(value));
-                    fileWriter.write("\t");
+                    bfileWriter.write(sha1(value));
+                    bfileWriter.write("\t");
                 }
-                fileWriter.newLine();
+                bfileWriter.newLine();
             }
         }catch (Exception e) {
             String logFileName = System.getProperties().getProperty("analysis.LogFile");
