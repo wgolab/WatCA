@@ -98,14 +98,14 @@ public class History {
             SortedSet<Cluster> tail = clusterSet.tailSet(a);
             for (Cluster b : tail) {
                 if (a == b) {
-                    long newScore = Collections.max(sfn.getScores(a, b));                    
+                    long newScore = Collections.max(sfn.getScores(a, b));
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", Value = " + a.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {
                         tempScore = Math.max(tempScore, newScore);                       
                     }
                 } else if (a.overlaps(b)) {
-                    long newScore = Collections.max(sfn.getScores(a, b));                   
+                    long newScore = Collections.max(sfn.getScores(a, b));
                     if (out != null && (showZeroScores || newScore > 0))
                         out.println("Key = " + a.getKey() + ", ValueA = " + a.getValue() + ", ValueB = " + b.getValue() + ", Score = " + newScore);
                     if (newScore > 0) {

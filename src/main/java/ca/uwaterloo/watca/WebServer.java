@@ -169,9 +169,11 @@ class WebServer {
                 ret = "<h1>Stop NoSQL DB</h1>" + "<pre>Stoppping service ...</pre>";
                 cmd = "bash control.sh " + "kill_db" ;
             } else if (query.contains("action=workYCSB")) {
+		ana.newWorkload();
                 ret = "<h1>YCSB Work</h1>" + "<pre>Running work phase ...</pre>";
                 cmd = "bash control.sh " + "work_ycsb";
             } else if (query.contains("action=loadYCSB")) {
+		ana.newWorkload();
                 ret = "<h1>YCSB Load</h1>" + "<pre>Running load phase ...</pre>";
                 cmd = "bash control.sh " + "load_ycsb";
             } else {
@@ -214,7 +216,7 @@ class WebServer {
             else
                 ret += "<option value=\"zipfian\">zipfian</option>";
             if (prop.getProperty("dist").equals("hotspot"))
-                ret += "<option value=\"hotspot\" selected>zipfian</option>";
+                ret += "<option value=\"hotspot\" selected>hotspot</option>";
             else
                 ret += "<option value=\"hotspot\">hotspot</option>";
             ret += "</select> </p>";

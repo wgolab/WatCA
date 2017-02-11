@@ -1,5 +1,9 @@
 package ca.uwaterloo.watca;
 
+import java.io.IOException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +46,11 @@ public class RealtimeAnalyzer {
 
     private ConcurrentHashMap<String, History> keyHistMap;
     private ScoreFunction sfn;
+    private boolean saveLogs;
+    private PrintWriter logFileWriter;
 
-    public RealtimeAnalyzer() {
+    public RealtimeAnalyzer(boolean saveLogs) {
+	this.saveLogs = saveLogs;
         operations = new ArrayList();
         numLines = new AtomicInteger();
         outputStaleProp = new TreeMap();
@@ -70,13 +77,36 @@ public class RealtimeAnalyzer {
     }
 
     public void processOperation(Operation op) {
+        int n = numLines.getAndIncrement();
         synchronized (operations) {
             operations.add(op);
+	    if (logFileWriter != null) {
+		if (op.isRead()) {
+		    logFileWriter.println(op.getStart() + "\tINV\t" + n + "\tR\t" + op.getKey());
+		    logFileWriter.println(op.getFinish() + "\tRES\t" + n + "\tR\t" + op.getKey() + "\t" + op.getValue());
+		} else {
+		    logFileWriter.println(op.getStart() + "\tINV\t" + n + "\tW\t" + op.getKey() + "\t" + op.getValue());
+		    logFileWriter.println(op.getFinish() + "\tRES\t" + n + "\tW\t" + op.getKey());
+		}
+		logFileWriter.flush();
+	    }
         }
-        int n = numLines.getAndIncrement();
         if (n % 100000 == 0) {
-            System.out.println("Num lines: " + n);
+            System.out.println("Total number of operations processed: " + n);
         }
+    }
+
+    public void newWorkload() {
+	try {
+	    if (logFileWriter != null) {
+		logFileWriter.close();
+	    }
+	    File f = File.createTempFile("watca_", ".log");
+	    System.out.println("New workload logged to temporary file " + f.getName());
+	    logFileWriter = new PrintWriter(new FileWriter(f));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
     }
 
     public void setScoreType(String type) {
@@ -158,7 +188,6 @@ public class RealtimeAnalyzer {
         synchronized (outputStaleProp) {
             outputStaleProp.put(now, staleProp);
         }
-        System.out.println("Staleness proportion at time " + now + " is " + staleProp);
 
         // Compute staleness quartiles.
         List<Long> quarts = new ArrayList();
@@ -195,12 +224,11 @@ public class RealtimeAnalyzer {
         }
         float thru = 0;
         if (maxFinish > minFinish) {
-            thru = (float) numOps / (maxFinish - minFinish);
+            thru = (float)numOps / (maxFinish - minFinish);
         }
         synchronized (outputThroughput) {
             outputThroughput.put(now, thru);
         }
-        System.out.println("Throughput at time " + now + " is " + thru);
 
         // Analyze latency.
         long totLat = 0;
@@ -222,7 +250,10 @@ public class RealtimeAnalyzer {
             }
         }
 
-        System.out.println("The whole computeMetrics take time " + (System.currentTimeMillis() - now) + " ms.");
+        System.out.println("Metric computation at time " + now + " processed " + numOps + " ops in " +
+			   (System.currentTimeMillis() - now) + " ms, " +
+			   "operation throughput is " + thru + " kops/s, " +
+			   "metric value (inconsistency) is " + staleProp);
     }
 
     public String getOutputStaleProp() {

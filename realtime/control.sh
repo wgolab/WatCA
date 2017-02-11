@@ -83,6 +83,15 @@ kill_db() {
     echo "NoSQL DB servers stopped."
 }
 
+kill_java() {
+    shellPath=$WatcaPath/realtime
+    cmd="cd ${shellPath} && bash control_stub.sh kill_java"
+    echo $cmd
+
+    run_on_servers "${cmd}" "KillJava" 1
+    echo "Java stopped."
+}
+
 start_DB() {
     echo "Begin to start NoSQL DB servers"
     shellPath=$WatcaPath/realtime
@@ -100,25 +109,31 @@ start_DB() {
 
 load_YCSB() {
 
-    echo "Generate partion workload files"
+    echo "Generate partition workload files"
     serverNum=`cat servers_public | wc -l`
-    countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
+    countPerHost=`echo "scale = 10; ${keyspace} / ${serverNum}" | bc`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
-
     start=0
 
     for public_ip in `cat servers_public`
     do
+	nextStart=`printf "%.*f\n" 0 $start`
+	nextCount=`printf "%.*f\n" 0 $countPerHost`
+	if [ ${keyspace} -lt ${serverNum} ]
+	then
+	    nextStart=0
+	    nextCount=${keyspace}
+	fi
 	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
         sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
             -e s/REQUESTDISTRIBUTION_Placeholder/${dist}/ \
             -e s/HOTSPOTDATAFRACTION_Placeholder/${hotspotdatafraction}/ \
-            -e s/INSERTSTART_Placeholder/${start}/ \
-            -e s/INSERTCOUNT_Placeholder/${countPerHost}/ \
+            -e s/INSERTSTART_Placeholder/${nextStart}/ \
+            -e s/INSERTCOUNT_Placeholder/${nextCount}/ \
             my_workload.template > gen_file/workload".${host}"
-        start=`expr $start + $countPerHost`
+        start=`echo "scale = 10; $start + $countPerHost" | bc`
     done
 
     echo "Sync files to servers"
@@ -135,25 +150,23 @@ load_YCSB() {
 }
 
 work_YCSB() {
-    echo "Generate partion workload files"
+    echo "Generate partition workload files"
     serverNum=`cat servers_public | wc -l`
-    countPerHost=`echo ${keyspace} ${serverNum} | awk '{printf "%d", $1 / $2}'`
+    # using entire key space at each server for work phase
+    keySpaceSize=`echo ${keyspace}`
     update_prop=`echo 1 ${read_prop} | awk '{printf "%f", $1 - $2}'`
-
-    start=0
 
     for public_ip in `cat servers_public`
     do
 	host=`cat servers_public_private | grep $public_ip | awk '{print $2}'`
-        sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
+	sed -e s/RECORDCOUNT_Placeholder/${keyspace}/ \
             -e s/READPROPORTION_Placeholder/${read_prop}/ \
             -e s/UPDATEPROPORTION_Placeholder/${update_prop}/ \
             -e s/REQUESTDISTRIBUTION_Placeholder/${dist}/ \
             -e s/HOTSPOTDATAFRACTION_Placeholder/${hotspotdatafraction}/ \
-            -e s/INSERTSTART_Placeholder/${start}/ \
-            -e s/INSERTCOUNT_Placeholder/${countPerHost}/ \
+            -e s/INSERTSTART_Placeholder/0/ \
+            -e s/INSERTCOUNT_Placeholder/${keySpaceSize}/ \
             my_workload.template > gen_file/workload".${host}"
-        start=`expr $start + $countPerHost`
     done
 
     echo "Sync files to servers"
@@ -179,6 +192,9 @@ case $1 in
         ;;
     kill_db)
         kill_db
+        ;;
+    kill_java)
+        kill_java
         ;;
     load_ycsb)
         load_YCSB
