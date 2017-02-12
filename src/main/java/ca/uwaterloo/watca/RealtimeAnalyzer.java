@@ -101,8 +101,8 @@ public class RealtimeAnalyzer {
 	    if (logFileWriter != null) {
 		logFileWriter.close();
 	    }
-	    File f = File.createTempFile("watca_", ".log");
-	    System.out.println("New workload logged to temporary file " + f.getName());
+	    File f = File.createTempFile("watca_", ".log", new File("."));
+	    System.out.println("New workload logged to temporary file " + f.getCanonicalPath());
 	    logFileWriter = new PrintWriter(new FileWriter(f));
 	} catch (IOException e) {
 	    e.printStackTrace();
