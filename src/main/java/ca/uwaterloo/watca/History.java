@@ -39,7 +39,7 @@ public class History {
     }
     
     public long getTotalNoOfScores() {
-        return clusterMap.size();
+        return clusterSet.size();
     }    
     
     public long getNoOfPositiveScores(){
@@ -90,8 +90,7 @@ public class History {
 	}
 	return ret;
     }
-
-    // TODO : Change percentage of inconsistent operations caculation to per value
+    
     public List<Long> logScores(ScoreFunction sfn, PrintWriter out, boolean showZeroScores) {
         List<Long> ret = new ArrayList();
         for (Cluster a : clusterSet) {

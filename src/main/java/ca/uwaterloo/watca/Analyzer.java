@@ -26,7 +26,8 @@ public class Analyzer {
     private boolean showZeroScores;
     private final String scoreFileName;
     private final String outPath;    
-    private final static String PROP_FILE_NAME = "/proportions.log"; 
+    private final static String PROP_FILE_NAME = "/proportions.log";
+    public final static String PER_ZONE_SCORE_FILE_NAME = "/scores_per_zone.log";
     
     public Analyzer(String outputPath, String fileName, boolean showZeroes, ScoreFunction sfn) {
         operations = new ArrayList();
@@ -49,18 +50,7 @@ public class Analyzer {
 
         // first add new operations
         ConcurrentMap<String, List<Operation>> keyOpsMap
-                = temp.parallelStream().collect(Collectors.groupingByConcurrent(Operation::getKey));
-        /*keyOpsMap.entrySet().parallelStream().forEach((e) -> {
-            History h = keyHistMap.get(e.getKey());
-            if (h == null) {
-                h = new History(e.getKey());
-                keyHistMap.put(e.getKey(), h);
-            }
-            List<Operation> ops = e.getValue();
-            for (Operation op : ops) {
-                h.addOperation(op);
-            }
-        });*/
+                = temp.parallelStream().collect(Collectors.groupingByConcurrent(Operation::getKey));       
         
         for (String key : keyOpsMap.keySet()) {
             History h = keyHistMap.get(key);
@@ -75,7 +65,6 @@ public class Analyzer {
         }        
         
         PrintWriter logWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + scoreFileName));       
-        
         // compute scores for each history
         ConcurrentMap<String, List<Long>> keyScoreMap = new ConcurrentHashMap();
         // ScoreFunction sfn = new RegularScoreFunction();
@@ -84,7 +73,7 @@ public class Analyzer {
         });
         logWriter.close();
         
-        PrintWriter propWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + PROP_FILE_NAME, true));
+        PrintWriter propWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + PROP_FILE_NAME, true));        
         int noOfScores = 0;
         int noOfPosScores = 0;
         for (String key : keyHistMap.keySet()) {
@@ -95,6 +84,17 @@ public class Analyzer {
         float prop = (float)noOfPosScores / noOfScores;
         propWriter.println(noOfScores + "\t" + noOfPosScores + "\t" + noOfZeroScores + "\t" + prop);
         propWriter.close();
+        
+        // Record scores again for SPECSHIFT histogram, the scores recorded in History.java
+        // may not be reliable, as it is not necessarily per value
+        PrintWriter scoreWriter = new PrintWriter(new FileWriter(outPath.replaceAll("/+$", "") + PER_ZONE_SCORE_FILE_NAME, true));
+        List<Long> scoreList = new ArrayList(); 
+        keyScoreMap.entrySet().stream().forEach((e) -> {
+            scoreList.addAll(e.getValue());
+        });
+        for(Long s : scoreList)
+            scoreWriter.println(s);
+        scoreWriter.close();
     }
     
     public void processOperation(Operation op) {
