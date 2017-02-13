@@ -34,7 +34,16 @@ public class RegularScoreFunction implements ScoreFunction {
                 return 0;
             } else {
                 // yes conflict
-                return Math.min(aMaxReadStart - bWriteFinish, bMaxReadStart - aWriteFinish)/2;
+		long baseScore = Math.min(aMaxReadStart - bWriteFinish, bMaxReadStart - aWriteFinish)/2;
+		long extraScore = Long.MAX_VALUE;
+		if (aWriteFinish < bWriteStart) {
+		    extraScore = Math.max(bWriteStart - aWriteFinish, (bMaxReadStart - bWriteFinish)/2);
+		} else if (bWriteFinish < aWriteStart) {
+		    extraScore = Math.max(aWriteStart - bWriteFinish, (aMaxReadStart - aWriteFinish)/2);
+		} else {
+		    extraScore = Math.min((aMaxReadStart - aWriteFinish)/2, (bMaxReadStart - bWriteFinish)/2);   
+		}
+                return Math.min(baseScore, extraScore);
             }
         } else if (aIsForward && !bIsForward) {
             // one forward zone
