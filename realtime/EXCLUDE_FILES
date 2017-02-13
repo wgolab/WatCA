@@ -2,3 +2,8 @@
 *.swp
 STATE/
 watca*.log
+execution.log
+lintest_input/
+lintest_output/
+regtest_input/
+regtest_output
