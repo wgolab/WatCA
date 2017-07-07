@@ -77,3 +77,4 @@ ConsAD | [SIGMOD 2012](http://www.cs.mcgill.ca/~kzella/ConsAD.pdf) | Zellag and 
 Graduate students involved in this project were supported in part by the
 [Natural Sciences and Engineering Council of Canada (NSERC)](http://www.nserc-crsng.gc.ca)
 and the [Google Faculty Research Awards Program](http://research.google.com/research-outreach.html#/research-outreach/faculty-engagement/faculty-research-awards).
+Development of WatCA has been supported since 2016 by Amazon's [AWS Cloud Credits for Research program](https://aws.amazon.com/grants/).
