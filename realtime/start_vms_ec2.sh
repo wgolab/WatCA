@@ -14,7 +14,7 @@ for REGION in ` cat ec2_regions`
 do
   echo Region: $REGION
   export EC2_URL=https://ec2.${REGION}.amazonaws.com
-  ec2-describe-instances | grep 'INSTANCE' | cut -d$'\t' -f 2 > instances_tmp
+  ec2-describe-instances | grep 'INSTANCE' | grep 'stopped' | cut -d$'\t' -f 2 > instances_tmp
   echo Found `cat instances_tmp`
   for IID in `cat instances_tmp`
   do
