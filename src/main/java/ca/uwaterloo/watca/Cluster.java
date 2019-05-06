@@ -14,6 +14,7 @@ public class Cluster implements Comparable<Cluster> {
     private String value;
     private Set<Operation> reads;
     private Operation dictWrite;
+    private boolean moreThanOneDictWrite = false;
     private long minStart;
     private long maxStart;
     private long maxReadStart;
@@ -67,7 +68,12 @@ public class Cluster implements Comparable<Cluster> {
             reads.add(op);
             maxReadStart = Math.max(maxReadStart, op.getStart());
         } else if (op.isWrite()) {
-            dictWrite = op;
+	    if (dictWrite != null) {
+		moreThanOneDictWrite = true;
+		return;
+	    } else {
+		dictWrite = op;
+	    }
         }
         minStart = Math.min(minStart, op.getStart());
         maxStart = Math.max(maxStart, op.getStart());
@@ -158,6 +164,10 @@ public class Cluster implements Comparable<Cluster> {
 
     public int getNumOperations() {
         return reads.size() + (dictWrite != null ? 1 : 0);
+    }
+
+    public boolean hasMoreThanOneDictWrite() {
+	return moreThanOneDictWrite;
     }
 
     public String toString() {

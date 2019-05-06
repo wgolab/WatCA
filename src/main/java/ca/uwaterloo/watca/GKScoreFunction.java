@@ -25,6 +25,8 @@ public class GKScoreFunction implements ScoreFunction {
 	if (a == b)
 	    if (a.getDictWrite() == null)
 		return 2; // zone missing a dictating write
+	    else if (a.hasMoreThanOneDictWrite())
+		return 3;
 	    else
 		return 0;
 

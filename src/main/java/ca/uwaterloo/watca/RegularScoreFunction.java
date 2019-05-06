@@ -26,7 +26,12 @@ public class RegularScoreFunction implements ScoreFunction {
 
 
 	if (a == b)
-	    return 0;
+	    if (a.getDictWrite() == null)
+		return 2; // zone missing a dictating write
+	    else if (a.hasMoreThanOneDictWrite())
+		return 3;
+	    else
+		return 0;
         else if (aIsForward && bIsForward) {
             // two forward zones
             if (aMaxReadStart < bWriteFinish || bMaxReadStart < aWriteFinish) {
