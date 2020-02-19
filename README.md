@@ -21,7 +21,7 @@ process ID, and thread ID.
 **R|W** denotes the operation type (read/get vs. write/put).
 The **key** and **value** denote the key-value pair, and must not contain any tabs.
 (If in doubt, encode the values using base64 or hash them.)
-The **value** is only included in the invocation event or a write and the response event of a read.
+The **value** is only included in the invocation event of a write and the response event of a read.
 
 Sample log files are provided in the [samplelogs](../../tree/master/samplelogs) subdirectory.
 One file is a positive example, meaning that it satisfies linearizability.
